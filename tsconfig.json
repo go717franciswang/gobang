@@ -20,8 +20,14 @@
         "!./node_modules/**/*"
     ],
     "files": [
-        "./main.ts",
+        "./Boot.ts",
+        "./Game.ts",
+        "./MainMenu.ts",
+        "./Preloader.ts",
+        "./gobang.ts",
+        "./move.ts",
         "./p2.d.ts",
-        "./phaser.d.ts"
+        "./phaser.d.ts",
+        "./player.ts"
     ]
 }
