@@ -34,7 +34,7 @@ var Gobang = (function () {
             return;
         }
         this.board[move.row][move.column] = player.color;
-        if (this.isGameOver(player)) {
+        if (this.isWinningMove(move, player)) {
             player.win();
             this.nonPendingPlayer.lose();
         }
@@ -46,70 +46,32 @@ var Gobang = (function () {
         this.pendingPlayer = this.nonPendingPlayer;
         this.nonPendingPlayer = tmp;
     };
-    Gobang.prototype.isGameOver = function (checkPlayer) {
-        var run;
-        for (var i = 0; i < this.size; i++) {
-            run = 0;
-            for (var j = 0; j < this.size; j++) {
-                if (this.board[i][j] == checkPlayer.color) {
-                    run++;
-                }
-                else {
-                    run = 0;
-                }
-                if (run == 5) {
-                    return true;
-                }
+    Gobang.prototype.isWinningMove = function (move, player) {
+        var directions = [[0, 1], [1, 0], [1, 1], [-1, 1]];
+        for (var i = 0; i < directions.length; i++) {
+            var dx = directions[i][0];
+            var dy = directions[i][1];
+            var run = 1;
+            var m = 1;
+            while (move.column + dx * m >= 0
+                && move.column + dx * m < this.size
+                && move.row + dy * m >= 0
+                && move.row + dy * m < this.size
+                && this.board[move.row + dy * m][move.column + dx * m] == player.color) {
+                run++;
+                m++;
             }
-        }
-        for (var i = 0; i < this.size; i++) {
-            run = 0;
-            for (var j = 0; j < this.size; j++) {
-                if (this.board[j][i] == checkPlayer.color) {
-                    run++;
-                }
-                else {
-                    run = 0;
-                }
-                if (run == 5) {
-                    return true;
-                }
+            var m = -1;
+            while (move.column + dx * m >= 0
+                && move.column + dx * m < this.size
+                && move.row + dy * m >= 0
+                && move.row + dy * m < this.size
+                && this.board[move.row + dy * m][move.column + dx * m] == player.color) {
+                run++;
+                m--;
             }
-        }
-        for (var i = 0; i < (this.size - 4) * 2 - 1; i++) {
-            run = 0;
-            var r = Math.max(this.size - 5 - i, 0);
-            var c = Math.max(i - (this.size - 5), 0);
-            while (r < this.size || c < this.size) {
-                if (this.board[r][c] == checkPlayer.color) {
-                    run++;
-                }
-                else {
-                    run = 0;
-                }
-                if (run == 5) {
-                    return true;
-                }
-                r++;
-                c++;
-            }
-        }
-        for (var i = 0; i < (this.size - 4) * 2 - 1; i++) {
-            run = 0;
-            var r = Math.min(i + 4, this.size - 1);
-            var c = Math.max(i - (this.size - 5), 0);
-            while (r >= 0 || c < this.size) {
-                if (this.board[r][c] == checkPlayer.color) {
-                    run++;
-                }
-                else {
-                    run = 0;
-                }
-                if (run == 5) {
-                    return true;
-                }
-                r--;
-                c++;
+            if (run >= 5) {
+                return true;
             }
         }
         return false;

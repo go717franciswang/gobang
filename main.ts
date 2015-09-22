@@ -42,7 +42,7 @@ class Gobang {
     }
 
     this.board[move.row][move.column] = player.color;
-    if (this.isGameOver(player)) {
+    if (this.isWinningMove(move, player)) {
       player.win();
       this.nonPendingPlayer.lose();
     }
@@ -56,82 +56,37 @@ class Gobang {
     this.nonPendingPlayer = tmp;
   }
 
-  isGameOver(checkPlayer: Player): boolean {
-    var run: number;
+  isWinningMove(move: Move, player: Player): boolean {
+    var directions: number[][] = [[0,1], [1,0], [1,1], [-1,1]];
+    for (var i = 0; i < directions.length; i++) {
+      var dx = directions[i][0];
+      var dy = directions[i][1];
+      var run = 1;
 
-    // check rows
-    for (var i: number = 0; i < this.size; i++) {
-      run = 0;
-
-      for (var j: number = 0; j < this.size; j++) {
-        if (this.board[i][j] == checkPlayer.color) {
-          run++;
-        } else {
-          run = 0;
-        }
-
-        if (run == 5) {
-          return true;
-        }
+      var m = 1;
+      while (move.column+dx*m >= 0
+        && move.column+dx*m < this.size
+        && move.row+dy*m >= 0
+        && move.row+dy*m < this.size
+        && this.board[move.row+dy*m][move.column+dx*m] == player.color
+      ) {
+        run++;
+        m++;
       }
-    }
 
-    // check columns
-    for (var i: number = 0; i < this.size; i++) {
-      run = 0;
-
-      for (var j: number = 0; j < this.size; j++) {
-        if (this.board[j][i] == checkPlayer.color) {
-          run++;
-        } else {
-          run = 0;
-        }
-
-        if (run == 5) {
-          return true;
-        }
+      var m = -1;
+      while (move.column+dx*m >= 0
+        && move.column+dx*m < this.size
+        && move.row+dy*m >= 0
+        && move.row+dy*m < this.size
+        && this.board[move.row+dy*m][move.column+dx*m] == player.color
+      ) {
+        run++;
+        m--;
       }
-    }
 
-    // check right-down diagnals
-    for (var i: number = 0; i < (this.size-4)*2-1; i++) {
-      run = 0;
-      var r: number = Math.max(this.size-5-i, 0);
-      var c: number = Math.max(i-(this.size-5), 0);
-
-      while (r < this.size || c < this.size) {
-        if (this.board[r][c] == checkPlayer.color) {
-          run++;
-        } else {
-          run = 0;
-        }
-
-        if (run == 5) {
-          return true;
-        }
-        r++;
-        c++;
-      }
-    }
-
-    // check right-up diagnals
-    for (var i: number = 0; i < (this.size-4)*2-1; i++) {
-      run = 0;
-      var r: number = Math.min(i+4, this.size-1);
-      var c: number = Math.max(i-(this.size-5), 0);
-
-      while (r >= 0 || c < this.size) {
-        if (this.board[r][c] == checkPlayer.color) {
-          run++;
-        } else {
-          run = 0;
-        }
-
-        if (run == 5) {
-          return true;
-        }
-        r--;
-        c++;
+      if (run >= 5) {
+        return true;
       }
     }
 
