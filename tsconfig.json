@@ -12,7 +12,8 @@
         "removeComments": true,
         "noLib": false,
         "preserveConstEnums": true,
-        "suppressImplicitAnyIndexErrors": true
+        "suppressImplicitAnyIndexErrors": true,
+        "out": "main.js"
     },
     "filesGlob": [
         "./**/*.ts",
@@ -24,10 +25,12 @@
         "./Game.ts",
         "./MainMenu.ts",
         "./Preloader.ts",
+        "./SinglePlayer.ts",
         "./gobang.ts",
         "./move.ts",
         "./p2.d.ts",
         "./phaser.d.ts",
+        "./pixi.d.ts",
         "./player.ts"
     ]
 }

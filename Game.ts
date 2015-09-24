@@ -2,6 +2,7 @@
 /// <reference path="./Boot.ts"/>
 /// <reference path="./Preloader.ts"/>
 /// <reference path="./MainMenu.ts"/>
+/// <reference path="./SinglePlayer.ts"/>
 
 module GobangOnline {
   export class Game extends Phaser.Game {
@@ -14,7 +15,7 @@ module GobangOnline {
       this.state.add('Preloader', Preloader, false);
       this.state.add('MainMenu', MainMenu, false);
       // this.state.add('MultiPlayer', MultiPlayer, false);
-      // this.state.add('SinglePlayer', SinglePlayer, false);
+      this.state.add('SinglePlayer', SinglePlayer, false);
 
       this.state.start('Boot');
     }
