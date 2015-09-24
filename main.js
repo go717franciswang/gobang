@@ -33,7 +33,7 @@ var GobangOnline;
             this.load.image('menu', 'assets/menu.jpg');
             this.load.image('singlePlayerButton', 'assets/Play-button.gif');
             this.load.image('board', 'assets/board.jpg');
-            this.load.spritesheet('piece', 'assets/pieces.png', 297, 145, 2);
+            this.load.spritesheet('piece', 'assets/pieces.png', 289, 289, 2);
         };
         Preloader.prototype.create = function () {
             var tween = this.add.tween(this.preloadBar).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);
@@ -83,6 +83,32 @@ var GobangOnline;
             this.board.anchor.setTo(0.5, 0.5);
             var scale = this.game.height / this.board.height;
             this.board.scale.setTo(scale, scale);
+        };
+        SinglePlayer.prototype.move2position = function (move) {
+            return {
+                x: move.column * 525 / 15 + 135,
+                y: move.row * 525 / 15 + 35
+            };
+        };
+        SinglePlayer.prototype.position2move = function (position) {
+            return {
+                row: Math.round((position.y - 35) / (525 / 15)),
+                column: Math.round((position.x - 135) / (525 / 15))
+            };
+        };
+        SinglePlayer.prototype.update = function () {
+            if (this.game.input.activePointer.isDown) {
+                var move = this.position2move(this.game.input.activePointer);
+                if (this.isMoveValid(move)) {
+                    var pos = this.move2position(move);
+                    var piece = this.add.sprite(pos.x, pos.y, 'piece');
+                    piece.anchor.setTo(0.5, 0.5);
+                    piece.scale.setTo(0.12);
+                }
+            }
+        };
+        SinglePlayer.prototype.isMoveValid = function (move) {
+            return move.row >= 0 && move.row < 16 && move.column >= 0 && move.column < 16;
         };
         return SinglePlayer;
     })(Phaser.State);

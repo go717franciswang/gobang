@@ -12,7 +12,7 @@ module GobangOnline {
       this.load.image('menu', 'assets/menu.jpg');
       this.load.image('singlePlayerButton', 'assets/Play-button.gif');
       this.load.image('board', 'assets/board.jpg');
-      this.load.spritesheet('piece', 'assets/pieces.png', 297, 145, 2);
+      this.load.spritesheet('piece', 'assets/pieces.png', 289, 289, 2);
     }
 
     create() {
