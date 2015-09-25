@@ -26,12 +26,13 @@
         "./MainMenu.ts",
         "./Preloader.ts",
         "./SinglePlayer.ts",
+        "./aiPlayer.ts",
         "./gobang.ts",
+        "./humanPlayer.ts",
         "./move.ts",
         "./p2.d.ts",
         "./phaser.d.ts",
         "./pixi.d.ts",
-        "./player.ts",
-        "./position.ts"
+        "./player.ts"
     ]
 }

@@ -71,68 +71,6 @@ var GobangOnline;
     })(Phaser.State);
     GobangOnline.MainMenu = MainMenu;
 })(GobangOnline || (GobangOnline = {}));
-var GobangOnline;
-(function (GobangOnline) {
-    var SinglePlayer = (function (_super) {
-        __extends(SinglePlayer, _super);
-        function SinglePlayer() {
-            _super.apply(this, arguments);
-        }
-        SinglePlayer.prototype.create = function () {
-            this.board = this.add.sprite(this.game.width / 2, this.game.height / 2, 'board');
-            this.board.anchor.setTo(0.5, 0.5);
-            var scale = this.game.height / this.board.height;
-            this.board.scale.setTo(scale, scale);
-        };
-        SinglePlayer.prototype.move2position = function (move) {
-            return {
-                x: move.column * 525 / 15 + 135,
-                y: move.row * 525 / 15 + 35
-            };
-        };
-        SinglePlayer.prototype.position2move = function (position) {
-            return {
-                row: Math.round((position.y - 35) / (525 / 15)),
-                column: Math.round((position.x - 135) / (525 / 15))
-            };
-        };
-        SinglePlayer.prototype.update = function () {
-            if (this.game.input.activePointer.isDown) {
-                var move = this.position2move(this.game.input.activePointer);
-                if (this.isMoveValid(move)) {
-                    var pos = this.move2position(move);
-                    var piece = this.add.sprite(pos.x, pos.y, 'piece');
-                    piece.anchor.setTo(0.5, 0.5);
-                    piece.scale.setTo(0.12);
-                }
-            }
-        };
-        SinglePlayer.prototype.isMoveValid = function (move) {
-            return move.row >= 0 && move.row < 16 && move.column >= 0 && move.column < 16;
-        };
-        return SinglePlayer;
-    })(Phaser.State);
-    GobangOnline.SinglePlayer = SinglePlayer;
-})(GobangOnline || (GobangOnline = {}));
-var GobangOnline;
-(function (GobangOnline) {
-    var Game = (function (_super) {
-        __extends(Game, _super);
-        function Game() {
-            _super.call(this, 800, 600, Phaser.AUTO, 'content', null);
-            this.state.add('Boot', GobangOnline.Boot, false);
-            this.state.add('Preloader', GobangOnline.Preloader, false);
-            this.state.add('MainMenu', GobangOnline.MainMenu, false);
-            this.state.add('SinglePlayer', GobangOnline.SinglePlayer, false);
-            this.state.start('Boot');
-        }
-        return Game;
-    })(Phaser.Game);
-    GobangOnline.Game = Game;
-})(GobangOnline || (GobangOnline = {}));
-window.onload = function () {
-    var game = new GobangOnline.Game();
-};
 var EMPTY = 0;
 var BLACK = 1;
 var WHITE = 2;
@@ -251,3 +189,84 @@ var Gobang = (function () {
     };
     return Gobang;
 })();
+var HumanPlayer = (function () {
+    function HumanPlayer() {
+    }
+    HumanPlayer.prototype.setColor = function (color) {
+        this.color = color;
+    };
+    HumanPlayer.prototype.takeTurn = function (context, lastMove) {
+    };
+    HumanPlayer.prototype.badMove = function (context, badMove) {
+    };
+    HumanPlayer.prototype.win = function () {
+    };
+    HumanPlayer.prototype.lose = function () {
+    };
+    return HumanPlayer;
+})();
+var GobangOnline;
+(function (GobangOnline) {
+    var SinglePlayer = (function (_super) {
+        __extends(SinglePlayer, _super);
+        function SinglePlayer() {
+            _super.apply(this, arguments);
+        }
+        SinglePlayer.prototype.create = function () {
+            this.board = this.add.sprite(this.game.width / 2, this.game.height / 2, 'board');
+            this.board.anchor.setTo(0.5, 0.5);
+            var scale = this.game.height / this.board.height;
+            this.board.scale.setTo(scale, scale);
+            this.humanPlayer = new HumanPlayer();
+            this.aiPlayer = new AiPlayer();
+            this.engine = new Gobang(16, this.HumanPlayer, this.AiPlayer);
+        };
+        SinglePlayer.prototype.move2position = function (move) {
+            return {
+                x: move.column * 525 / 15 + 135,
+                y: move.row * 525 / 15 + 35
+            };
+        };
+        SinglePlayer.prototype.position2move = function (position) {
+            return {
+                row: Math.round((position.y - 35) / (525 / 15)),
+                column: Math.round((position.x - 135) / (525 / 15))
+            };
+        };
+        SinglePlayer.prototype.update = function () {
+            if (this.game.input.activePointer.isDown) {
+                var move = this.position2move(this.game.input.activePointer);
+                if (this.isMoveValid(move)) {
+                    var pos = this.move2position(move);
+                    var piece = this.add.sprite(pos.x, pos.y, 'piece');
+                    piece.anchor.setTo(0.5, 0.5);
+                    piece.scale.setTo(0.12);
+                }
+            }
+        };
+        SinglePlayer.prototype.isMoveValid = function (move) {
+            return move.row >= 0 && move.row < 16 && move.column >= 0 && move.column < 16;
+        };
+        return SinglePlayer;
+    })(Phaser.State);
+    GobangOnline.SinglePlayer = SinglePlayer;
+})(GobangOnline || (GobangOnline = {}));
+var GobangOnline;
+(function (GobangOnline) {
+    var Game = (function (_super) {
+        __extends(Game, _super);
+        function Game() {
+            _super.call(this, 800, 600, Phaser.AUTO, 'content', null);
+            this.state.add('Boot', GobangOnline.Boot, false);
+            this.state.add('Preloader', GobangOnline.Preloader, false);
+            this.state.add('MainMenu', GobangOnline.MainMenu, false);
+            this.state.add('SinglePlayer', GobangOnline.SinglePlayer, false);
+            this.state.start('Boot');
+        }
+        return Game;
+    })(Phaser.Game);
+    GobangOnline.Game = Game;
+})(GobangOnline || (GobangOnline = {}));
+window.onload = function () {
+    var game = new GobangOnline.Game();
+};

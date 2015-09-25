@@ -1,19 +1,27 @@
 /// <reference path="./phaser.d.ts"/>
 /// <reference path="./pixi.d.ts"/>
 /// <reference path="./move.ts"/>
-/// <reference path="./position.ts"/>
+/// <reference path="./gobang.ts"/>
+/// <reference path="./humanPlayer.ts"/>
+/// <reference path="./aiPlayer.ts"/>
 
 module GobangOnline {
 
   export class SinglePlayer extends Phaser.State {
 
     board: Phaser.Sprite;
+    humanPlayer: HumanPlayer;
+    aiPlayer: AiPlayer;
+    engine: Gobang;
 
     create() {
       this.board = this.add.sprite(this.game.width/2, this.game.height/2, 'board');
       this.board.anchor.setTo(0.5, 0.5);
       var scale: number = this.game.height / this.board.height;
       this.board.scale.setTo(scale, scale);
+      this.humanPlayer = new HumanPlayer();
+      this.aiPlayer = new AiPlayer();
+      this.engine = new Gobang(16, this.humanPlayer, this.aiPlayer);
     }
 
     move2position(move: Move): { x: number; y: number } {
