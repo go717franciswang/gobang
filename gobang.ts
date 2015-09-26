@@ -6,9 +6,11 @@ var BLACK: number = 1;
 var WHITE: number = 2;
 
 class Gobang {
-  private board: number[][];
+  public board: number[][];
   private pendingPlayer: Player;
   private nonPendingPlayer: Player;
+  private onRegisterMove: any;
+  private gameOver: boolean = false;
 
   constructor(public size: number, public player1: Player, public player2: Player) {
     this.board = [];
@@ -31,11 +33,18 @@ class Gobang {
 
     this.pendingPlayer.setColor(BLACK);
     this.nonPendingPlayer.setColor(WHITE);
+  }
+
+  startGame() {
     this.pendingPlayer.takeTurn(this, null);
   }
 
+  setOnRegisterMove(callback) {
+    this.onRegisterMove = callback;
+  }
+
   registerMove(player: Player, move: Move): void {
-    if (player != this.pendingPlayer) {
+    if (this.gameOver || player != this.pendingPlayer) {
       return;
     }
 
@@ -46,11 +55,14 @@ class Gobang {
 
     this.board[move.row][move.column] = player.color;
     if (this.isGameOver(player)) {
+      this.gameOver = true;
       player.win();
       this.nonPendingPlayer.lose();
     }
     this.swapPlayingPendingState();
     this.pendingPlayer.takeTurn(this, move);
+
+    this.onRegisterMove(player, move);
   }
 
   swapPlayingPendingState(): void {
@@ -102,7 +114,7 @@ class Gobang {
       var r: number = Math.max(this.size-5-i, 0);
       var c: number = Math.max(i-(this.size-5), 0);
 
-      while (r < this.size || c < this.size) {
+      while (r < this.size && c < this.size) {
         if (this.board[r][c] == checkPlayer.color) {
           run++;
         } else {
@@ -123,7 +135,7 @@ class Gobang {
       var r: number = Math.min(i+4, this.size-1);
       var c: number = Math.max(i-(this.size-5), 0);
 
-      while (r >= 0 || c < this.size) {
+      while (r >= 0 && c < this.size) {
         if (this.board[r][c] == checkPlayer.color) {
           run++;
         } else {
@@ -139,5 +151,13 @@ class Gobang {
     }
 
     return false;
+  }
+
+  isMoveValid(move: Move): boolean {
+    return move.row >= 0
+      && move.row < this.size
+      && move.column >= 0
+      && move.column < this.size
+      && this.board[move.row][move.column] == EMPTY;
   }
 }

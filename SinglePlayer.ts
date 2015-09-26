@@ -22,6 +22,17 @@ module GobangOnline {
       this.humanPlayer = new HumanPlayer();
       this.aiPlayer = new AiPlayer();
       this.engine = new Gobang(16, this.humanPlayer, this.aiPlayer);
+      this.engine.setOnRegisterMove((player, move) => {
+        var pos = this.move2position(move);
+        var piece = this.add.sprite(pos.x, pos.y, 'piece');
+        if (player.color == WHITE) {
+          piece.frame = 1;
+        }
+
+        piece.anchor.setTo(0.5, 0.5);
+        piece.scale.setTo(0.12);
+      });
+      this.engine.startGame();
     }
 
     move2position(move: Move): { x: number; y: number } {
@@ -39,19 +50,14 @@ module GobangOnline {
     }
 
     update() {
-      if (this.game.input.activePointer.isDown) {
-        var move = this.position2move(this.game.input.activePointer);
-        if (this.isMoveValid(move)) {
-          var pos = this.move2position(move);
-          var piece = this.add.sprite(pos.x, pos.y, 'piece');
-          piece.anchor.setTo(0.5, 0.5);
-          piece.scale.setTo(0.12);
+      if (this.humanPlayer.takingTurn) {
+        if (this.game.input.activePointer.isDown) {
+          var move = this.position2move(this.game.input.activePointer);
+          if (this.engine.isMoveValid(move)) {
+            this.humanPlayer.makeMove(move);
+          }
         }
       }
-    }
-
-    isMoveValid(move: Move): boolean {
-      return move.row >= 0 && move.row < 16 && move.column >= 0 && move.column < 16;
     }
   }
 }
