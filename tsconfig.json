@@ -31,6 +31,7 @@
         "./humanPlayer.ts",
         "./move.ts",
         "./p2.d.ts",
+        "./patternScores.ts",
         "./phaser.d.ts",
         "./pixi.d.ts",
         "./player.ts"
