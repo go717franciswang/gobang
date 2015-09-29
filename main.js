@@ -326,3 +326,130 @@ var GobangOnline;
 window.onload = function () {
     var game = new GobangOnline.Game();
 };
+var GobangOnline;
+(function (GobangOnline) {
+    GobangOnline.patternScore = [
+        {
+            name: "长连",
+            patterns: [
+                "11111"
+            ],
+            score: 100000,
+            rivalScore: 10000
+        },
+        {
+            name: "活四",
+            patterns: [
+                "011110"
+            ],
+            score: 5000,
+            rivalScore: 3000
+        },
+        {
+            name: "冲四",
+            patterns: [
+                "011112",
+                "0101110",
+                "0110110"
+            ],
+            score: 2100,
+            rivalScore: 1800
+        },
+        {
+            name: "活三",
+            patterns: [
+                "01110",
+                "010110"
+            ],
+            score: 1800,
+            rivalScore: 1200
+        },
+        {
+            name: "眠三",
+            patterns: [
+                "001112",
+                "010112",
+                "011012",
+                "10011",
+                "10101",
+                "2011102"
+            ],
+            score: 600,
+            rivalScore: 480
+        },
+        {
+            name: "活二",
+            patterns: [
+                "00110",
+                "01010",
+                "010010"
+            ],
+            score: 300,
+            rivalScore: 240
+        },
+        {
+            name: "眠二",
+            patterns: [
+                "000112",
+                "001012",
+                "010012",
+                "10001",
+                "2010102",
+                "2011002"
+            ],
+            score: 100,
+            rivalScore: 80
+        },
+    ];
+})(GobangOnline || (GobangOnline = {}));
+var GobangOnline;
+(function (GobangOnline) {
+    var PieceOwnership;
+    (function (PieceOwnership) {
+        PieceOwnership[PieceOwnership["None"] = 0] = "None";
+        PieceOwnership[PieceOwnership["Mine"] = 1] = "Mine";
+        PieceOwnership[PieceOwnership["Opponent"] = 2] = "Opponent";
+        PieceOwnership[PieceOwnership["Root"] = 3] = "Root";
+    })(PieceOwnership || (PieceOwnership = {}));
+    ;
+    var Node = (function () {
+        function Node(ownership) {
+            this.ownership = ownership;
+            this.children = {};
+            this.score = 0;
+            this.rivalScore = 0;
+        }
+        return Node;
+    })();
+    GobangOnline.root = new Node(PieceOwnership.Root);
+    for (var i = 0; i < GobangOnline.patternScore.length; i++) {
+        var patternData = GobangOnline.patternScore[i];
+        for (var j = 0; j < patternData.patterns.length; j++) {
+            var pattern = patternData.patterns[j];
+            var node = GobangOnline.root;
+            for (var k = 0; k < pattern.length; k++) {
+                var ownership = parseInt(pattern[k]);
+                if (!node.children[ownership]) {
+                    node.children[ownership] = new Node(ownership);
+                }
+                node = node.children[ownership];
+                if (k == pattern.length - 1) {
+                    node.score = patternData.score;
+                    node.rivalScore = patternData.rivalScore;
+                }
+            }
+            node = GobangOnline.root;
+            for (var k = pattern.length - 1; k >= 0; k--) {
+                var ownership = parseInt(pattern[k]);
+                if (!node.children[ownership]) {
+                    node.children[ownership] = new Node(ownership);
+                }
+                node = node.children[ownership];
+                if (k == 0) {
+                    node.score = patternData.score;
+                    node.rivalScore = patternData.rivalScore;
+                }
+            }
+        }
+    }
+})(GobangOnline || (GobangOnline = {}));

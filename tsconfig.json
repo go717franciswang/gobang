@@ -32,6 +32,7 @@
         "./move.ts",
         "./p2.d.ts",
         "./patternScores.ts",
+        "./patternSearchTree.ts",
         "./phaser.d.ts",
         "./pixi.d.ts",
         "./player.ts"
