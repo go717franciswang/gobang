@@ -2,13 +2,13 @@
 
 module GobangOnline {
   export class AiPlayer implements Player {
-    public color: number;
+    public color: Color;
 
     constructor() {
 
     }
 
-    setColor(color: number) {
+    setColor(color: Color) {
       this.color = color;
     }
 
@@ -16,7 +16,7 @@ module GobangOnline {
       var availableMoves: Move[] = [];
       for (var i = 0; i < context.size; i++) {
         for (var j = 0; j < context.size; j++) {
-          if (context.board[i][j] == EMPTY) {
+          if (context.board[i][j] == Color.Empty) {
             availableMoves.push({ row: i, column: j });
           }
         }

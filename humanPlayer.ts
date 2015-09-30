@@ -4,7 +4,7 @@
 
 module GobangOnline {
   export class HumanPlayer implements Player {
-    public color: number;
+    public color: Color;
     public takingTurn: boolean;
     private context: Gobang;
 
@@ -12,7 +12,7 @@ module GobangOnline {
       this.takingTurn = false;
     }
 
-    setColor(color: number) {
+    setColor(color: Color) {
       this.color = color;
     }
 

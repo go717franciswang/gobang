@@ -73,9 +73,13 @@ var GobangOnline;
 })(GobangOnline || (GobangOnline = {}));
 var GobangOnline;
 (function (GobangOnline) {
-    GobangOnline.EMPTY = 0;
-    GobangOnline.BLACK = 1;
-    GobangOnline.WHITE = 2;
+    (function (Color) {
+        Color[Color["Empty"] = 0] = "Empty";
+        Color[Color["Black"] = 1] = "Black";
+        Color[Color["White"] = 2] = "White";
+    })(GobangOnline.Color || (GobangOnline.Color = {}));
+    var Color = GobangOnline.Color;
+    ;
     var Gobang = (function () {
         function Gobang(size, player1, player2) {
             this.size = size;
@@ -86,7 +90,7 @@ var GobangOnline;
             for (var i = 0; i < size; i++) {
                 this.board[i] = [];
                 for (var j = 0; j < size; j++) {
-                    this.board[i][j] = GobangOnline.EMPTY;
+                    this.board[i][j] = Color.Empty;
                 }
             }
             if (Math.floor(Math.random() * 2) == 0) {
@@ -97,8 +101,8 @@ var GobangOnline;
                 this.nonPendingPlayer = player1;
                 this.pendingPlayer = player2;
             }
-            this.pendingPlayer.setColor(GobangOnline.BLACK);
-            this.nonPendingPlayer.setColor(GobangOnline.WHITE);
+            this.pendingPlayer.setColor(Color.Black);
+            this.nonPendingPlayer.setColor(Color.White);
         }
         Gobang.prototype.startGame = function () {
             this.pendingPlayer.takeTurn(this, null);
@@ -110,7 +114,7 @@ var GobangOnline;
             if (this.gameOver || player != this.pendingPlayer) {
                 return;
             }
-            if (this.board[move.row][move.column] != GobangOnline.EMPTY) {
+            if (this.board[move.row][move.column] != Color.Empty) {
                 player.badMove(this, move);
                 return;
             }
@@ -202,7 +206,7 @@ var GobangOnline;
                 && move.row < this.size
                 && move.column >= 0
                 && move.column < this.size
-                && this.board[move.row][move.column] == GobangOnline.EMPTY;
+                && this.board[move.row][move.column] == Color.Empty;
         };
         return Gobang;
     })();
@@ -248,7 +252,7 @@ var GobangOnline;
             var availableMoves = [];
             for (var i = 0; i < context.size; i++) {
                 for (var j = 0; j < context.size; j++) {
-                    if (context.board[i][j] == GobangOnline.EMPTY) {
+                    if (context.board[i][j] == GobangOnline.Color.Empty) {
                         availableMoves.push({ row: i, column: j });
                     }
                 }
@@ -285,7 +289,7 @@ var GobangOnline;
             this.engine.setOnRegisterMove(function (player, move) {
                 var pos = _this.move2position(move);
                 var piece = _this.add.sprite(pos.x, pos.y, 'piece');
-                if (player.color == GobangOnline.WHITE) {
+                if (player.color == GobangOnline.Color.White) {
                     piece.frame = 1;
                 }
                 piece.anchor.setTo(0.5, 0.5);

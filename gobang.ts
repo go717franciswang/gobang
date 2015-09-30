@@ -2,12 +2,10 @@
 ///<reference path="./move.ts" />
 
 module GobangOnline {
-  export var EMPTY: number = 0;
-  export var BLACK: number = 1;
-  export var WHITE: number = 2;
+  export enum Color { Empty, Black, White };
 
   export class Gobang {
-    public board: number[][];
+    public board: Color[][];
     private pendingPlayer: Player;
     private nonPendingPlayer: Player;
     private onRegisterMove: any;
@@ -20,7 +18,7 @@ module GobangOnline {
         this.board[i] = [];
 
         for (var j: number = 0; j < size; j++) {
-          this.board[i][j] = EMPTY;
+          this.board[i][j] = Color.Empty;
         }
       }
 
@@ -32,8 +30,8 @@ module GobangOnline {
         this.pendingPlayer = player2;
       }
 
-      this.pendingPlayer.setColor(BLACK);
-      this.nonPendingPlayer.setColor(WHITE);
+      this.pendingPlayer.setColor(Color.Black);
+      this.nonPendingPlayer.setColor(Color.White);
     }
 
     startGame() {
@@ -49,7 +47,7 @@ module GobangOnline {
         return;
       }
 
-      if (this.board[move.row][move.column] != EMPTY) {
+      if (this.board[move.row][move.column] != Color.Empty) {
         player.badMove(this, move);
         return;
       }
@@ -159,7 +157,7 @@ module GobangOnline {
         && move.row < this.size
         && move.column >= 0
         && move.column < this.size
-        && this.board[move.row][move.column] == EMPTY;
+        && this.board[move.row][move.column] == Color.Empty;
     }
   }
 }

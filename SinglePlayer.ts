@@ -25,7 +25,7 @@ module GobangOnline {
       this.engine.setOnRegisterMove((player, move) => {
         var pos = this.move2position(move);
         var piece = this.add.sprite(pos.x, pos.y, 'piece');
-        if (player.color == WHITE) {
+        if (player.color == Color.White) {
           piece.frame = 1;
         }
 
