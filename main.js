@@ -71,189 +71,201 @@ var GobangOnline;
     })(Phaser.State);
     GobangOnline.MainMenu = MainMenu;
 })(GobangOnline || (GobangOnline = {}));
-var EMPTY = 0;
-var BLACK = 1;
-var WHITE = 2;
-var Gobang = (function () {
-    function Gobang(size, player1, player2) {
-        this.size = size;
-        this.player1 = player1;
-        this.player2 = player2;
-        this.gameOver = false;
-        this.board = [];
-        for (var i = 0; i < size; i++) {
-            this.board[i] = [];
-            for (var j = 0; j < size; j++) {
-                this.board[i][j] = EMPTY;
-            }
-        }
-        if (Math.floor(Math.random() * 2) == 0) {
-            this.pendingPlayer = player1;
-            this.nonPendingPlayer = player2;
-        }
-        else {
-            this.nonPendingPlayer = player1;
-            this.pendingPlayer = player2;
-        }
-        this.pendingPlayer.setColor(BLACK);
-        this.nonPendingPlayer.setColor(WHITE);
-    }
-    Gobang.prototype.startGame = function () {
-        this.pendingPlayer.takeTurn(this, null);
-    };
-    Gobang.prototype.setOnRegisterMove = function (callback) {
-        this.onRegisterMove = callback;
-    };
-    Gobang.prototype.registerMove = function (player, move) {
-        if (this.gameOver || player != this.pendingPlayer) {
-            return;
-        }
-        if (this.board[move.row][move.column] != EMPTY) {
-            player.badMove(this, move);
-            return;
-        }
-        this.board[move.row][move.column] = player.color;
-        if (this.isGameOver(player)) {
-            this.gameOver = true;
-            player.win();
-            this.nonPendingPlayer.lose();
-        }
-        this.swapPlayingPendingState();
-        this.pendingPlayer.takeTurn(this, move);
-        this.onRegisterMove(player, move);
-    };
-    Gobang.prototype.swapPlayingPendingState = function () {
-        var tmp = this.pendingPlayer;
-        this.pendingPlayer = this.nonPendingPlayer;
-        this.nonPendingPlayer = tmp;
-    };
-    Gobang.prototype.isGameOver = function (checkPlayer) {
-        var run;
-        for (var i = 0; i < this.size; i++) {
-            run = 0;
-            for (var j = 0; j < this.size; j++) {
-                if (this.board[i][j] == checkPlayer.color) {
-                    run++;
-                }
-                else {
-                    run = 0;
-                }
-                if (run == 5) {
-                    return true;
+var GobangOnline;
+(function (GobangOnline) {
+    GobangOnline.EMPTY = 0;
+    GobangOnline.BLACK = 1;
+    GobangOnline.WHITE = 2;
+    var Gobang = (function () {
+        function Gobang(size, player1, player2) {
+            this.size = size;
+            this.player1 = player1;
+            this.player2 = player2;
+            this.gameOver = false;
+            this.board = [];
+            for (var i = 0; i < size; i++) {
+                this.board[i] = [];
+                for (var j = 0; j < size; j++) {
+                    this.board[i][j] = GobangOnline.EMPTY;
                 }
             }
+            if (Math.floor(Math.random() * 2) == 0) {
+                this.pendingPlayer = player1;
+                this.nonPendingPlayer = player2;
+            }
+            else {
+                this.nonPendingPlayer = player1;
+                this.pendingPlayer = player2;
+            }
+            this.pendingPlayer.setColor(GobangOnline.BLACK);
+            this.nonPendingPlayer.setColor(GobangOnline.WHITE);
         }
-        for (var i = 0; i < this.size; i++) {
-            run = 0;
-            for (var j = 0; j < this.size; j++) {
-                if (this.board[j][i] == checkPlayer.color) {
-                    run++;
-                }
-                else {
-                    run = 0;
-                }
-                if (run == 5) {
-                    return true;
+        Gobang.prototype.startGame = function () {
+            this.pendingPlayer.takeTurn(this, null);
+        };
+        Gobang.prototype.setOnRegisterMove = function (callback) {
+            this.onRegisterMove = callback;
+        };
+        Gobang.prototype.registerMove = function (player, move) {
+            if (this.gameOver || player != this.pendingPlayer) {
+                return;
+            }
+            if (this.board[move.row][move.column] != GobangOnline.EMPTY) {
+                player.badMove(this, move);
+                return;
+            }
+            this.board[move.row][move.column] = player.color;
+            if (this.isGameOver(player)) {
+                this.gameOver = true;
+                player.win();
+                this.nonPendingPlayer.lose();
+            }
+            this.swapPlayingPendingState();
+            this.pendingPlayer.takeTurn(this, move);
+            this.onRegisterMove(player, move);
+        };
+        Gobang.prototype.swapPlayingPendingState = function () {
+            var tmp = this.pendingPlayer;
+            this.pendingPlayer = this.nonPendingPlayer;
+            this.nonPendingPlayer = tmp;
+        };
+        Gobang.prototype.isGameOver = function (checkPlayer) {
+            var run;
+            for (var i = 0; i < this.size; i++) {
+                run = 0;
+                for (var j = 0; j < this.size; j++) {
+                    if (this.board[i][j] == checkPlayer.color) {
+                        run++;
+                    }
+                    else {
+                        run = 0;
+                    }
+                    if (run == 5) {
+                        return true;
+                    }
                 }
             }
-        }
-        for (var i = 0; i < (this.size - 4) * 2 - 1; i++) {
-            run = 0;
-            var r = Math.max(this.size - 5 - i, 0);
-            var c = Math.max(i - (this.size - 5), 0);
-            while (r < this.size && c < this.size) {
-                if (this.board[r][c] == checkPlayer.color) {
-                    run++;
-                }
-                else {
-                    run = 0;
-                }
-                if (run == 5) {
-                    return true;
-                }
-                r++;
-                c++;
-            }
-        }
-        for (var i = 0; i < (this.size - 4) * 2 - 1; i++) {
-            run = 0;
-            var r = Math.min(i + 4, this.size - 1);
-            var c = Math.max(i - (this.size - 5), 0);
-            while (r >= 0 && c < this.size) {
-                if (this.board[r][c] == checkPlayer.color) {
-                    run++;
-                }
-                else {
-                    run = 0;
-                }
-                if (run == 5) {
-                    return true;
-                }
-                r--;
-                c++;
-            }
-        }
-        return false;
-    };
-    Gobang.prototype.isMoveValid = function (move) {
-        return move.row >= 0
-            && move.row < this.size
-            && move.column >= 0
-            && move.column < this.size
-            && this.board[move.row][move.column] == EMPTY;
-    };
-    return Gobang;
-})();
-var HumanPlayer = (function () {
-    function HumanPlayer() {
-        this.takingTurn = false;
-    }
-    HumanPlayer.prototype.setColor = function (color) {
-        this.color = color;
-    };
-    HumanPlayer.prototype.takeTurn = function (context, lastMove) {
-        this.takingTurn = true;
-        this.context = context;
-    };
-    HumanPlayer.prototype.makeMove = function (move) {
-        this.takingTurn = false;
-        this.context.registerMove(this, move);
-    };
-    HumanPlayer.prototype.badMove = function (context, badMove) {
-    };
-    HumanPlayer.prototype.win = function () {
-        console.log('human wins');
-    };
-    HumanPlayer.prototype.lose = function () {
-    };
-    return HumanPlayer;
-})();
-var AiPlayer = (function () {
-    function AiPlayer() {
-    }
-    AiPlayer.prototype.setColor = function (color) {
-        this.color = color;
-    };
-    AiPlayer.prototype.takeTurn = function (context, lastMove) {
-        var availableMoves = [];
-        for (var i = 0; i < context.size; i++) {
-            for (var j = 0; j < context.size; j++) {
-                if (context.board[i][j] == EMPTY) {
-                    availableMoves.push({ row: i, column: j });
+            for (var i = 0; i < this.size; i++) {
+                run = 0;
+                for (var j = 0; j < this.size; j++) {
+                    if (this.board[j][i] == checkPlayer.color) {
+                        run++;
+                    }
+                    else {
+                        run = 0;
+                    }
+                    if (run == 5) {
+                        return true;
+                    }
                 }
             }
+            for (var i = 0; i < (this.size - 4) * 2 - 1; i++) {
+                run = 0;
+                var r = Math.max(this.size - 5 - i, 0);
+                var c = Math.max(i - (this.size - 5), 0);
+                while (r < this.size && c < this.size) {
+                    if (this.board[r][c] == checkPlayer.color) {
+                        run++;
+                    }
+                    else {
+                        run = 0;
+                    }
+                    if (run == 5) {
+                        return true;
+                    }
+                    r++;
+                    c++;
+                }
+            }
+            for (var i = 0; i < (this.size - 4) * 2 - 1; i++) {
+                run = 0;
+                var r = Math.min(i + 4, this.size - 1);
+                var c = Math.max(i - (this.size - 5), 0);
+                while (r >= 0 && c < this.size) {
+                    if (this.board[r][c] == checkPlayer.color) {
+                        run++;
+                    }
+                    else {
+                        run = 0;
+                    }
+                    if (run == 5) {
+                        return true;
+                    }
+                    r--;
+                    c++;
+                }
+            }
+            return false;
+        };
+        Gobang.prototype.isMoveValid = function (move) {
+            return move.row >= 0
+                && move.row < this.size
+                && move.column >= 0
+                && move.column < this.size
+                && this.board[move.row][move.column] == GobangOnline.EMPTY;
+        };
+        return Gobang;
+    })();
+    GobangOnline.Gobang = Gobang;
+})(GobangOnline || (GobangOnline = {}));
+var GobangOnline;
+(function (GobangOnline) {
+    var HumanPlayer = (function () {
+        function HumanPlayer() {
+            this.takingTurn = false;
         }
-        var randIdx = Math.floor(Math.random() * availableMoves.length);
-        context.registerMove(this, availableMoves[randIdx]);
-    };
-    AiPlayer.prototype.badMove = function (context, badMove) {
-    };
-    AiPlayer.prototype.win = function () {
-    };
-    AiPlayer.prototype.lose = function () {
-    };
-    return AiPlayer;
-})();
+        HumanPlayer.prototype.setColor = function (color) {
+            this.color = color;
+        };
+        HumanPlayer.prototype.takeTurn = function (context, lastMove) {
+            this.takingTurn = true;
+            this.context = context;
+        };
+        HumanPlayer.prototype.makeMove = function (move) {
+            this.takingTurn = false;
+            this.context.registerMove(this, move);
+        };
+        HumanPlayer.prototype.badMove = function (context, badMove) {
+        };
+        HumanPlayer.prototype.win = function () {
+            console.log('human wins');
+        };
+        HumanPlayer.prototype.lose = function () {
+        };
+        return HumanPlayer;
+    })();
+    GobangOnline.HumanPlayer = HumanPlayer;
+})(GobangOnline || (GobangOnline = {}));
+var GobangOnline;
+(function (GobangOnline) {
+    var AiPlayer = (function () {
+        function AiPlayer() {
+        }
+        AiPlayer.prototype.setColor = function (color) {
+            this.color = color;
+        };
+        AiPlayer.prototype.takeTurn = function (context, lastMove) {
+            var availableMoves = [];
+            for (var i = 0; i < context.size; i++) {
+                for (var j = 0; j < context.size; j++) {
+                    if (context.board[i][j] == GobangOnline.EMPTY) {
+                        availableMoves.push({ row: i, column: j });
+                    }
+                }
+            }
+            var randIdx = Math.floor(Math.random() * availableMoves.length);
+            context.registerMove(this, availableMoves[randIdx]);
+        };
+        AiPlayer.prototype.badMove = function (context, badMove) {
+        };
+        AiPlayer.prototype.win = function () {
+        };
+        AiPlayer.prototype.lose = function () {
+        };
+        return AiPlayer;
+    })();
+    GobangOnline.AiPlayer = AiPlayer;
+})(GobangOnline || (GobangOnline = {}));
 var GobangOnline;
 (function (GobangOnline) {
     var SinglePlayer = (function (_super) {
@@ -267,13 +279,13 @@ var GobangOnline;
             this.board.anchor.setTo(0.5, 0.5);
             var scale = this.game.height / this.board.height;
             this.board.scale.setTo(scale, scale);
-            this.humanPlayer = new HumanPlayer();
-            this.aiPlayer = new AiPlayer();
-            this.engine = new Gobang(16, this.humanPlayer, this.aiPlayer);
+            this.humanPlayer = new GobangOnline.HumanPlayer();
+            this.aiPlayer = new GobangOnline.AiPlayer();
+            this.engine = new GobangOnline.Gobang(16, this.humanPlayer, this.aiPlayer);
             this.engine.setOnRegisterMove(function (player, move) {
                 var pos = _this.move2position(move);
                 var piece = _this.add.sprite(pos.x, pos.y, 'piece');
-                if (player.color == WHITE) {
+                if (player.color == GobangOnline.WHITE) {
                     piece.frame = 1;
                 }
                 piece.anchor.setTo(0.5, 0.5);

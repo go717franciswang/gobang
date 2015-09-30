@@ -2,38 +2,40 @@
 /// <reference path="./gobang.ts"/>
 /// <reference path="./move.ts"/>
 
-class HumanPlayer implements Player {
-  public color: number;
-  public takingTurn: boolean;
-  private context: Gobang;
+module GobangOnline {
+  export class HumanPlayer implements Player {
+    public color: number;
+    public takingTurn: boolean;
+    private context: Gobang;
 
-  constructor() {
-    this.takingTurn = false;
-  }
+    constructor() {
+      this.takingTurn = false;
+    }
 
-  setColor(color: number) {
-    this.color = color;
-  }
+    setColor(color: number) {
+      this.color = color;
+    }
 
-  takeTurn(context: Gobang, lastMove: Move): void {
-    this.takingTurn = true;
-    this.context = context;
-  }
+    takeTurn(context: Gobang, lastMove: Move): void {
+      this.takingTurn = true;
+      this.context = context;
+    }
 
-  makeMove(move: Move) {
-    this.takingTurn = false;
-    this.context.registerMove(this, move);
-  }
+    makeMove(move: Move) {
+      this.takingTurn = false;
+      this.context.registerMove(this, move);
+    }
 
-  badMove(context: Gobang, badMove: Move): void {
+    badMove(context: Gobang, badMove: Move): void {
 
-  }
+    }
 
-  win(): void {
-    console.log('human wins');
-  }
+    win(): void {
+      console.log('human wins');
+    }
 
-  lose(): void {
+    lose(): void {
 
+    }
   }
 }
