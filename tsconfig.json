@@ -28,6 +28,7 @@
         "./SinglePlayer.ts",
         "./aiPlayer.ts",
         "./gobang.ts",
+        "./heuristics.ts",
         "./humanPlayer.ts",
         "./move.ts",
         "./p2.d.ts",

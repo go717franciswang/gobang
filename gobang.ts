@@ -153,11 +153,14 @@ module GobangOnline {
     }
 
     isMoveValid(move: Move): boolean {
-      return move.row >= 0
-        && move.row < this.size
-        && move.column >= 0
-        && move.column < this.size
-        && this.board[move.row][move.column] == Color.Empty;
+      return !this.isOutOfBound(move) && this.board[move.row][move.column] == Color.Empty;
+    }
+
+    isOutOfBound(move: Move): boolean {
+      return move.row < 0
+        || move.row >= this.size
+        || move.column < 0
+        || move.column >= this.size;
     }
   }
 }

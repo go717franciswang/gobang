@@ -1,4 +1,5 @@
 /// <reference path="./player.ts"/>
+/// <reference path="./heuristics.ts"/>
 
 module GobangOnline {
   export class AiPlayer implements Player {
@@ -13,6 +14,8 @@ module GobangOnline {
     }
 
     takeTurn(context: Gobang, lastMove: Move): void {
+      // console.log('heuristics: ' + computeHeuristicOfBoard(this, context));
+
       var availableMoves: Move[] = [];
       for (var i = 0; i < context.size; i++) {
         for (var j = 0; j < context.size; j++) {

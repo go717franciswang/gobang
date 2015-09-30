@@ -1,6 +1,7 @@
 /// <reference path="./player.ts"/>
 /// <reference path="./gobang.ts"/>
 /// <reference path="./move.ts"/>
+/// <reference path="./heuristics.ts"/>
 
 module GobangOnline {
   export class HumanPlayer implements Player {
@@ -24,6 +25,7 @@ module GobangOnline {
     makeMove(move: Move) {
       this.takingTurn = false;
       this.context.registerMove(this, move);
+      console.log('heuristics: ' + computeHeuristicOfBoard(this, this.context));
     }
 
     badMove(context: Gobang, badMove: Move): void {

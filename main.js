@@ -202,15 +202,237 @@ var GobangOnline;
             return false;
         };
         Gobang.prototype.isMoveValid = function (move) {
-            return move.row >= 0
-                && move.row < this.size
-                && move.column >= 0
-                && move.column < this.size
-                && this.board[move.row][move.column] == Color.Empty;
+            return !this.isOutOfBound(move) && this.board[move.row][move.column] == Color.Empty;
+        };
+        Gobang.prototype.isOutOfBound = function (move) {
+            return move.row < 0
+                || move.row >= this.size
+                || move.column < 0
+                || move.column >= this.size;
         };
         return Gobang;
     })();
     GobangOnline.Gobang = Gobang;
+})(GobangOnline || (GobangOnline = {}));
+var GobangOnline;
+(function (GobangOnline) {
+    GobangOnline.patternScore = [
+        {
+            name: "长连",
+            patterns: [
+                "11111"
+            ],
+            score: 100000,
+            rivalScore: 10000
+        },
+        {
+            name: "活四",
+            patterns: [
+                "011110"
+            ],
+            score: 5000,
+            rivalScore: 3000
+        },
+        {
+            name: "冲四",
+            patterns: [
+                "011112",
+                "0101110",
+                "0110110"
+            ],
+            score: 2100,
+            rivalScore: 1800
+        },
+        {
+            name: "活三",
+            patterns: [
+                "01110",
+                "010110"
+            ],
+            score: 1800,
+            rivalScore: 1200
+        },
+        {
+            name: "眠三",
+            patterns: [
+                "001112",
+                "010112",
+                "011012",
+                "10011",
+                "10101",
+                "2011102"
+            ],
+            score: 600,
+            rivalScore: 480
+        },
+        {
+            name: "活二",
+            patterns: [
+                "00110",
+                "01010",
+                "010010"
+            ],
+            score: 300,
+            rivalScore: 240
+        },
+        {
+            name: "眠二",
+            patterns: [
+                "000112",
+                "001012",
+                "010012",
+                "10001",
+                "2010102",
+                "2011002"
+            ],
+            score: 100,
+            rivalScore: 80
+        },
+    ];
+})(GobangOnline || (GobangOnline = {}));
+var GobangOnline;
+(function (GobangOnline) {
+    (function (PieceOwnership) {
+        PieceOwnership[PieceOwnership["None"] = 0] = "None";
+        PieceOwnership[PieceOwnership["Mine"] = 1] = "Mine";
+        PieceOwnership[PieceOwnership["Opponent"] = 2] = "Opponent";
+        PieceOwnership[PieceOwnership["Root"] = 3] = "Root";
+    })(GobangOnline.PieceOwnership || (GobangOnline.PieceOwnership = {}));
+    var PieceOwnership = GobangOnline.PieceOwnership;
+    ;
+    var Node = (function () {
+        function Node(ownership) {
+            this.ownership = ownership;
+            this.children = {};
+            this.score = 0;
+            this.rivalScore = 0;
+        }
+        return Node;
+    })();
+    GobangOnline.root = new Node(PieceOwnership.Root);
+    GobangOnline.maxDepth = 0;
+    for (var i = 0; i < GobangOnline.patternScore.length; i++) {
+        var patternData = GobangOnline.patternScore[i];
+        for (var j = 0; j < patternData.patterns.length; j++) {
+            var pattern = patternData.patterns[j];
+            var node = GobangOnline.root;
+            GobangOnline.maxDepth = Math.max(GobangOnline.maxDepth, pattern.length);
+            for (var k = 0; k < pattern.length; k++) {
+                var ownership = parseInt(pattern[k]);
+                if (!node.children[ownership]) {
+                    node.children[ownership] = new Node(ownership);
+                }
+                node = node.children[ownership];
+                if (k == pattern.length - 1) {
+                    node.score = patternData.score;
+                    node.rivalScore = patternData.rivalScore;
+                }
+            }
+            node = GobangOnline.root;
+            for (var k = pattern.length - 1; k >= 0; k--) {
+                var ownership = parseInt(pattern[k]);
+                if (!node.children[ownership]) {
+                    node.children[ownership] = new Node(ownership);
+                }
+                node = node.children[ownership];
+                if (k == 0) {
+                    node.score = patternData.score;
+                    node.rivalScore = patternData.rivalScore;
+                }
+            }
+        }
+    }
+})(GobangOnline || (GobangOnline = {}));
+var GobangOnline;
+(function (GobangOnline) {
+    var color2ownership = function (pieceColor, playerColor) {
+        if (pieceColor == playerColor) {
+            return GobangOnline.PieceOwnership.Mine;
+        }
+        else if (pieceColor == GobangOnline.Color.Empty) {
+            return GobangOnline.PieceOwnership.None;
+        }
+        else {
+            return GobangOnline.PieceOwnership.Opponent;
+        }
+    };
+    GobangOnline.computeHeuristicAt = function (player, move, engine) {
+        var totalHeuristics = 0;
+        var node = GobangOnline.root;
+        var heuristics = 0;
+        for (var i = 0; i < GobangOnline.maxDepth; i++) {
+            if (engine.isOutOfBound({ row: move.row, column: move.column + i })) {
+                break;
+            }
+            var ownership = color2ownership(engine.board[move.row][move.column + i], player.color);
+            if (node.children[ownership]) {
+                node = node.children[ownership];
+                heuristics = Math.max(node.score, heuristics);
+            }
+            else {
+                break;
+            }
+        }
+        totalHeuristics += heuristics;
+        node = GobangOnline.root;
+        heuristics = 0;
+        for (var i = 0; i < GobangOnline.maxDepth; i++) {
+            if (engine.isOutOfBound({ row: move.row + i, column: move.column })) {
+                break;
+            }
+            var ownership = color2ownership(engine.board[move.row + i][move.column], player.color);
+            if (node.children[ownership]) {
+                node = node.children[ownership];
+                heuristics = Math.max(node.score, heuristics);
+            }
+            else {
+                break;
+            }
+        }
+        totalHeuristics += heuristics;
+        node = GobangOnline.root;
+        heuristics = 0;
+        for (var i = 0; i < GobangOnline.maxDepth; i++) {
+            if (engine.isOutOfBound({ row: move.row + i, column: move.column + i })) {
+                break;
+            }
+            var ownership = color2ownership(engine.board[move.row + i][move.column + i], player.color);
+            if (node.children[ownership]) {
+                node = node.children[ownership];
+                heuristics = Math.max(node.score, heuristics);
+            }
+            else {
+                break;
+            }
+        }
+        totalHeuristics += heuristics;
+        node = GobangOnline.root;
+        heuristics = 0;
+        for (var i = 0; i < GobangOnline.maxDepth; i++) {
+            if (engine.isOutOfBound({ row: move.row - i, column: move.column + i })) {
+                break;
+            }
+            var ownership = color2ownership(engine.board[move.row - i][move.column + i], player.color);
+            if (node.children[ownership]) {
+                node = node.children[ownership];
+                heuristics = Math.max(node.score, heuristics);
+            }
+            else {
+                break;
+            }
+        }
+        totalHeuristics += heuristics;
+        return totalHeuristics;
+    };
+    GobangOnline.computeHeuristicOfBoard = function (player, engine) {
+        var totalHeuristics = 0;
+        for (var i = 0; i < engine.size; i++) {
+            for (var j = 0; j < engine.size; j++) {
+                totalHeuristics += GobangOnline.computeHeuristicAt(player, { row: i, column: j }, engine);
+            }
+        }
+        return totalHeuristics;
+    };
 })(GobangOnline || (GobangOnline = {}));
 var GobangOnline;
 (function (GobangOnline) {
@@ -228,6 +450,7 @@ var GobangOnline;
         HumanPlayer.prototype.makeMove = function (move) {
             this.takingTurn = false;
             this.context.registerMove(this, move);
+            console.log('heuristics: ' + GobangOnline.computeHeuristicOfBoard(this, this.context));
         };
         HumanPlayer.prototype.badMove = function (context, badMove) {
         };
@@ -342,130 +565,3 @@ var GobangOnline;
 window.onload = function () {
     var game = new GobangOnline.Game();
 };
-var GobangOnline;
-(function (GobangOnline) {
-    GobangOnline.patternScore = [
-        {
-            name: "长连",
-            patterns: [
-                "11111"
-            ],
-            score: 100000,
-            rivalScore: 10000
-        },
-        {
-            name: "活四",
-            patterns: [
-                "011110"
-            ],
-            score: 5000,
-            rivalScore: 3000
-        },
-        {
-            name: "冲四",
-            patterns: [
-                "011112",
-                "0101110",
-                "0110110"
-            ],
-            score: 2100,
-            rivalScore: 1800
-        },
-        {
-            name: "活三",
-            patterns: [
-                "01110",
-                "010110"
-            ],
-            score: 1800,
-            rivalScore: 1200
-        },
-        {
-            name: "眠三",
-            patterns: [
-                "001112",
-                "010112",
-                "011012",
-                "10011",
-                "10101",
-                "2011102"
-            ],
-            score: 600,
-            rivalScore: 480
-        },
-        {
-            name: "活二",
-            patterns: [
-                "00110",
-                "01010",
-                "010010"
-            ],
-            score: 300,
-            rivalScore: 240
-        },
-        {
-            name: "眠二",
-            patterns: [
-                "000112",
-                "001012",
-                "010012",
-                "10001",
-                "2010102",
-                "2011002"
-            ],
-            score: 100,
-            rivalScore: 80
-        },
-    ];
-})(GobangOnline || (GobangOnline = {}));
-var GobangOnline;
-(function (GobangOnline) {
-    var PieceOwnership;
-    (function (PieceOwnership) {
-        PieceOwnership[PieceOwnership["None"] = 0] = "None";
-        PieceOwnership[PieceOwnership["Mine"] = 1] = "Mine";
-        PieceOwnership[PieceOwnership["Opponent"] = 2] = "Opponent";
-        PieceOwnership[PieceOwnership["Root"] = 3] = "Root";
-    })(PieceOwnership || (PieceOwnership = {}));
-    ;
-    var Node = (function () {
-        function Node(ownership) {
-            this.ownership = ownership;
-            this.children = {};
-            this.score = 0;
-            this.rivalScore = 0;
-        }
-        return Node;
-    })();
-    GobangOnline.root = new Node(PieceOwnership.Root);
-    for (var i = 0; i < GobangOnline.patternScore.length; i++) {
-        var patternData = GobangOnline.patternScore[i];
-        for (var j = 0; j < patternData.patterns.length; j++) {
-            var pattern = patternData.patterns[j];
-            var node = GobangOnline.root;
-            for (var k = 0; k < pattern.length; k++) {
-                var ownership = parseInt(pattern[k]);
-                if (!node.children[ownership]) {
-                    node.children[ownership] = new Node(ownership);
-                }
-                node = node.children[ownership];
-                if (k == pattern.length - 1) {
-                    node.score = patternData.score;
-                    node.rivalScore = patternData.rivalScore;
-                }
-            }
-            node = GobangOnline.root;
-            for (var k = pattern.length - 1; k >= 0; k--) {
-                var ownership = parseInt(pattern[k]);
-                if (!node.children[ownership]) {
-                    node.children[ownership] = new Node(ownership);
-                }
-                node = node.children[ownership];
-                if (k == 0) {
-                    node.score = patternData.score;
-                    node.rivalScore = patternData.rivalScore;
-                }
-            }
-        }
-    }
-})(GobangOnline || (GobangOnline = {}));
