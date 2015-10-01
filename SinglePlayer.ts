@@ -53,7 +53,7 @@ module GobangOnline {
       if (this.humanPlayer.takingTurn) {
         if (this.game.input.activePointer.isDown) {
           var move = this.position2move(this.game.input.activePointer);
-          if (this.engine.isMoveValid(move)) {
+          if (this.engine.board.isMoveValid(move)) {
             this.humanPlayer.makeMove(move);
           }
         }

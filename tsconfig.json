@@ -27,6 +27,7 @@
         "./Preloader.ts",
         "./SinglePlayer.ts",
         "./aiPlayer.ts",
+        "./board.ts",
         "./gobang.ts",
         "./heuristics.ts",
         "./humanPlayer.ts",

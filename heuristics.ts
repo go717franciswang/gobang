@@ -1,7 +1,7 @@
 /// <reference path="./patternSearchTree.ts"/>
 /// <reference path="./move.ts"/>
 /// <reference path="./player.ts"/>
-/// <reference path="./gobang.ts"/>
+/// <reference path="./board.ts"/>
 
 module GobangOnline {
 
@@ -15,90 +15,49 @@ module GobangOnline {
     }
   };
 
-  export var computeHeuristicAt = function(player: Player, move: Move, engine: Gobang): number {
+  export var computeHeuristicAt = function(player: Player, move: Move, board: Board, getRivalScore: boolean=false): number {
     var totalHeuristics = 0;
+    var directions = [[0, 1], [1, 0], [1, 1], [-1, 1]];
 
-    // search right
-    var node = root;
-    var heuristics = 0;
-    for (var i = 0; i < maxDepth; i++) {
-      if (engine.isOutOfBound({ row: move.row, column: move.column+i })) {
-        break;
-      }
+    for (var i = 0; i < directions.length; i++) {
+      var node = root;
+      var heuristics = 0;
+      var dx = directions[i][1];
+      var dy = directions[i][0];
 
-      var ownership = color2ownership(engine.board[move.row][move.column+i], player.color);
-      if (node.children[ownership]) {
-        node = node.children[ownership];
-        heuristics = Math.max(node.score, heuristics);
-      } else {
-        break;
+      for (var j = 0; j < maxDepth; i++) {
+        var m = { row: move.row+dy*i, column: move.column+dx*i };
+        if (board.isOutOfBound(m)) {
+          break;
+        }
+
+        var ownership: PieceOwnership;
+        if (getRivalScore) {
+          ownership = color2ownership(board.colorAt(m), getOpponentColor(player.color));
+        } else {
+          ownership = color2ownership(board.colorAt(m), player.color);
+        }
+
+        if (node.children[ownership]) {
+          node = node.children[ownership];
+        } else {
+          heuristics = getRivalScore ? node.rivalScore : node.score;
+          break;
+        }
       }
+      totalHeuristics += heuristics;
     }
-    totalHeuristics += heuristics;
-
-    // search down
-    node = root;
-    heuristics = 0
-    for (var i = 0; i < maxDepth; i++) {
-      if (engine.isOutOfBound({ row: move.row+i, column: move.column })) {
-        break;
-      }
-
-      var ownership = color2ownership(engine.board[move.row+i][move.column], player.color);
-      if (node.children[ownership]) {
-        node = node.children[ownership];
-        heuristics = Math.max(node.score, heuristics);
-      } else {
-        break;
-      }
-    }
-    totalHeuristics += heuristics;
-
-    // search down-right
-    node = root;
-    heuristics = 0
-    for (var i = 0; i < maxDepth; i++) {
-      if (engine.isOutOfBound({ row: move.row+i, column: move.column+i })) {
-        break;
-      }
-
-      var ownership = color2ownership(engine.board[move.row+i][move.column+i], player.color);
-      if (node.children[ownership]) {
-        node = node.children[ownership];
-        heuristics = Math.max(node.score, heuristics);
-      } else {
-        break;
-      }
-    }
-    totalHeuristics += heuristics;
-
-    // search up-right
-    node = root;
-    heuristics = 0
-    for (var i = 0; i < maxDepth; i++) {
-      if (engine.isOutOfBound({ row: move.row-i, column: move.column+i })) {
-        break;
-      }
-
-      var ownership = color2ownership(engine.board[move.row-i][move.column+i], player.color);
-      if (node.children[ownership]) {
-        node = node.children[ownership];
-        heuristics = Math.max(node.score, heuristics);
-      } else {
-        break;
-      }
-    }
-    totalHeuristics += heuristics;
 
     return totalHeuristics;
   }
 
-  export var computeHeuristicOfBoard = function(player: Player, engine: Gobang): number {
+  export var computeHeuristicOfBoard = function(player: Player, board: Board): number {
     var totalHeuristics = 0;
 
-    for (var i = 0; i < engine.size; i++) {
-      for (var j = 0; j < engine.size; j++) {
-        totalHeuristics += computeHeuristicAt(player, { row: i, column: j }, engine);
+    for (var i = 0; i < board.size; i++) {
+      for (var j = 0; j < board.size; j++) {
+        totalHeuristics += computeHeuristicAt(player, { row: i, column: j }, board, false);
+        totalHeuristics -= computeHeuristicAt(player, { row: i, column: j }, board, true);
       }
     }
 

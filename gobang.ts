@@ -1,26 +1,18 @@
 ///<reference path="./player.ts" />
 ///<reference path="./move.ts" />
+///<reference path="./board.ts" />
 
 module GobangOnline {
-  export enum Color { Empty, Black, White };
 
   export class Gobang {
-    public board: Color[][];
+    public board: Board;
     private pendingPlayer: Player;
     private nonPendingPlayer: Player;
     private onRegisterMove: any;
     private gameOver: boolean = false;
 
     constructor(public size: number, public player1: Player, public player2: Player) {
-      this.board = [];
-
-      for (var i: number = 0; i < size; i++) {
-        this.board[i] = [];
-
-        for (var j: number = 0; j < size; j++) {
-          this.board[i][j] = Color.Empty;
-        }
-      }
+      this.board = new Board(size);
 
       if (Math.floor(Math.random()*2) == 0) {
         this.pendingPlayer = player1;
@@ -47,12 +39,12 @@ module GobangOnline {
         return;
       }
 
-      if (this.board[move.row][move.column] != Color.Empty) {
+      if (this.board.colorAt(move) != Color.Empty) {
         player.badMove(this, move);
         return;
       }
 
-      this.board[move.row][move.column] = player.color;
+      this.board.setColorAt(move, player.color);
       if (this.isGameOver(player)) {
         this.gameOver = true;
         player.win();
@@ -78,7 +70,7 @@ module GobangOnline {
         run = 0;
 
         for (var j: number = 0; j < this.size; j++) {
-          if (this.board[i][j] == checkPlayer.color) {
+          if (this.board.colorAt({ row: i, column: j }) == checkPlayer.color) {
             run++;
           } else {
             run = 0;
@@ -95,7 +87,7 @@ module GobangOnline {
         run = 0;
 
         for (var j: number = 0; j < this.size; j++) {
-          if (this.board[j][i] == checkPlayer.color) {
+          if (this.board.colorAt({ row: j, column: i }) == checkPlayer.color) {
             run++;
           } else {
             run = 0;
@@ -114,7 +106,7 @@ module GobangOnline {
         var c: number = Math.max(i-(this.size-5), 0);
 
         while (r < this.size && c < this.size) {
-          if (this.board[r][c] == checkPlayer.color) {
+          if (this.board.colorAt({ row: r, column: c }) == checkPlayer.color) {
             run++;
           } else {
             run = 0;
@@ -135,7 +127,7 @@ module GobangOnline {
         var c: number = Math.max(i-(this.size-5), 0);
 
         while (r >= 0 && c < this.size) {
-          if (this.board[r][c] == checkPlayer.color) {
+          if (this.board.colorAt({ row: r, column: c }) == checkPlayer.color) {
             run++;
           } else {
             run = 0;
@@ -150,17 +142,6 @@ module GobangOnline {
       }
 
       return false;
-    }
-
-    isMoveValid(move: Move): boolean {
-      return !this.isOutOfBound(move) && this.board[move.row][move.column] == Color.Empty;
-    }
-
-    isOutOfBound(move: Move): boolean {
-      return move.row < 0
-        || move.row >= this.size
-        || move.column < 0
-        || move.column >= this.size;
     }
   }
 }
