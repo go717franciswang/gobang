@@ -396,15 +396,14 @@ var GobangOnline;
     };
     GobangOnline.computeHeuristicAt = function (player, move, board, getRivalScore) {
         if (getRivalScore === void 0) { getRivalScore = false; }
-        var totalHeuristics = 0;
-        var directions = [[0, 1], [1, 0], [1, 1], [-1, 1]];
+        var heuristics = 0;
+        var directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
         for (var i = 0; i < directions.length; i++) {
             var node = GobangOnline.root;
-            var heuristics = 0;
-            var dx = directions[i][1];
-            var dy = directions[i][0];
+            var dx = directions[i][0];
+            var dy = directions[i][1];
             for (var j = 0; j < GobangOnline.maxDepth; i++) {
-                var m = { row: move.row + dy * i, column: move.column + dx * i };
+                var m = { row: move.row + dy * j, column: move.column + dx * j };
                 if (board.isOutOfBound(m)) {
                     break;
                 }
@@ -417,25 +416,27 @@ var GobangOnline;
                 }
                 if (node.children[ownership]) {
                     node = node.children[ownership];
+                    heuristics = Math.max(heuristics, getRivalScore ? node.rivalScore : node.score);
                 }
                 else {
-                    heuristics = getRivalScore ? node.rivalScore : node.score;
                     break;
                 }
             }
-            totalHeuristics += heuristics;
         }
-        return totalHeuristics;
+        return heuristics;
     };
     GobangOnline.computeHeuristicOfBoard = function (player, board) {
-        var totalHeuristics = 0;
+        var heuristics = 0;
+        var heuristicsRival = 0;
         for (var i = 0; i < board.size; i++) {
             for (var j = 0; j < board.size; j++) {
-                totalHeuristics += GobangOnline.computeHeuristicAt(player, { row: i, column: j }, board, false);
-                totalHeuristics -= GobangOnline.computeHeuristicAt(player, { row: i, column: j }, board, true);
+                var m = { row: i, column: j };
+                heuristics = Math.max(heuristics, GobangOnline.computeHeuristicAt(player, m, board, false));
+                heuristicsRival = Math.max(heuristicsRival, GobangOnline.computeHeuristicAt(player, m, board, true));
             }
         }
-        return totalHeuristics;
+        console.log(heuristics, heuristicsRival);
+        return heuristics - heuristicsRival;
     };
 })(GobangOnline || (GobangOnline = {}));
 var GobangOnline;
