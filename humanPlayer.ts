@@ -25,7 +25,7 @@ module GobangOnline {
     makeMove(move: Move) {
       this.takingTurn = false;
       this.context.registerMove(this, move);
-      console.log('heuristics: ' + computeHeuristicOfBoard(this, this.context.board));
+      //console.log('heuristics: ' + computeHeuristicOfBoard(this, this.context.board));
     }
 
     badMove(context: Gobang, badMove: Move): void {

@@ -5,7 +5,7 @@
 
 module GobangOnline {
 
-  var color2ownership = function(pieceColor: Color, playerColor: Color): PieceOwnership {
+  function color2ownership(pieceColor: Color, playerColor: Color): PieceOwnership {
     if (pieceColor == playerColor) {
       return PieceOwnership.Mine;
     } else if (pieceColor == Color.Empty) {
@@ -15,16 +15,17 @@ module GobangOnline {
     }
   };
 
-  export var computeHeuristicAt = function(player: Player, move: Move, board: Board, getRivalScore: boolean=false): number {
+  export function computeHeuristicAt(playerColor: Color, move: Move, board: Board, getRivalScore:boolean): number {
     var heuristics = 0;
     var directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
 
     for (var i = 0; i < directions.length; i++) {
+
       var node = root;
       var dx = directions[i][0];
       var dy = directions[i][1];
 
-      for (var j = 0; j < maxDepth; i++) {
+      for (var j = 0; j < maxDepth; j++) {
         var m = { row: move.row+dy*j, column: move.column+dx*j };
         if (board.isOutOfBound(m)) {
           break;
@@ -32,9 +33,9 @@ module GobangOnline {
 
         var ownership: PieceOwnership;
         if (getRivalScore) {
-          ownership = color2ownership(board.colorAt(m), getOpponentColor(player.color));
+          ownership = color2ownership(board.colorAt(m), getOpponentColor(playerColor));
         } else {
-          ownership = color2ownership(board.colorAt(m), player.color);
+          ownership = color2ownership(board.colorAt(m), playerColor);
         }
 
         if (node.children[ownership]) {
@@ -49,15 +50,15 @@ module GobangOnline {
     return heuristics;
   }
 
-  export var computeHeuristicOfBoard = function(player: Player, board: Board): number {
+  export function computeHeuristicOfBoard(playerColor: Color, board: Board): number {
     var heuristics = 0;
     var heuristicsRival = 0;
 
     for (var i = 0; i < board.size; i++) {
       for (var j = 0; j < board.size; j++) {
         var m = { row: i, column: j };
-        heuristics = Math.max(heuristics, computeHeuristicAt(player, m, board, false));
-        heuristicsRival = Math.max(heuristicsRival, computeHeuristicAt(player, m, board, true));
+        heuristics = Math.max(heuristics, computeHeuristicAt(playerColor, m, board, false));
+        heuristicsRival = Math.max(heuristicsRival, computeHeuristicAt(playerColor, m, board, true));
       }
     }
 

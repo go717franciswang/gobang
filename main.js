@@ -383,7 +383,7 @@ var GobangOnline;
 })(GobangOnline || (GobangOnline = {}));
 var GobangOnline;
 (function (GobangOnline) {
-    var color2ownership = function (pieceColor, playerColor) {
+    function color2ownership(pieceColor, playerColor) {
         if (pieceColor == playerColor) {
             return GobangOnline.PieceOwnership.Mine;
         }
@@ -393,26 +393,26 @@ var GobangOnline;
         else {
             return GobangOnline.PieceOwnership.Opponent;
         }
-    };
-    GobangOnline.computeHeuristicAt = function (player, move, board, getRivalScore) {
-        if (getRivalScore === void 0) { getRivalScore = false; }
+    }
+    ;
+    function computeHeuristicAt(playerColor, move, board, getRivalScore) {
         var heuristics = 0;
         var directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
         for (var i = 0; i < directions.length; i++) {
             var node = GobangOnline.root;
             var dx = directions[i][0];
             var dy = directions[i][1];
-            for (var j = 0; j < GobangOnline.maxDepth; i++) {
+            for (var j = 0; j < GobangOnline.maxDepth; j++) {
                 var m = { row: move.row + dy * j, column: move.column + dx * j };
                 if (board.isOutOfBound(m)) {
                     break;
                 }
                 var ownership;
                 if (getRivalScore) {
-                    ownership = color2ownership(board.colorAt(m), GobangOnline.getOpponentColor(player.color));
+                    ownership = color2ownership(board.colorAt(m), GobangOnline.getOpponentColor(playerColor));
                 }
                 else {
-                    ownership = color2ownership(board.colorAt(m), player.color);
+                    ownership = color2ownership(board.colorAt(m), playerColor);
                 }
                 if (node.children[ownership]) {
                     node = node.children[ownership];
@@ -424,20 +424,21 @@ var GobangOnline;
             }
         }
         return heuristics;
-    };
-    GobangOnline.computeHeuristicOfBoard = function (player, board) {
+    }
+    GobangOnline.computeHeuristicAt = computeHeuristicAt;
+    function computeHeuristicOfBoard(playerColor, board) {
         var heuristics = 0;
         var heuristicsRival = 0;
         for (var i = 0; i < board.size; i++) {
             for (var j = 0; j < board.size; j++) {
                 var m = { row: i, column: j };
-                heuristics = Math.max(heuristics, GobangOnline.computeHeuristicAt(player, m, board, false));
-                heuristicsRival = Math.max(heuristicsRival, GobangOnline.computeHeuristicAt(player, m, board, true));
+                heuristics = Math.max(heuristics, computeHeuristicAt(playerColor, m, board, false));
+                heuristicsRival = Math.max(heuristicsRival, computeHeuristicAt(playerColor, m, board, true));
             }
         }
-        console.log(heuristics, heuristicsRival);
         return heuristics - heuristicsRival;
-    };
+    }
+    GobangOnline.computeHeuristicOfBoard = computeHeuristicOfBoard;
 })(GobangOnline || (GobangOnline = {}));
 var GobangOnline;
 (function (GobangOnline) {
@@ -455,7 +456,6 @@ var GobangOnline;
         HumanPlayer.prototype.makeMove = function (move) {
             this.takingTurn = false;
             this.context.registerMove(this, move);
-            console.log('heuristics: ' + GobangOnline.computeHeuristicOfBoard(this, this.context.board));
         };
         HumanPlayer.prototype.badMove = function (context, badMove) {
         };
@@ -477,19 +477,62 @@ var GobangOnline;
             this.color = color;
         };
         AiPlayer.prototype.takeTurn = function (context, lastMove) {
-            var topCandidates = this.getTopCandidates(context.board, 1);
-            context.registerMove(this, topCandidates[0]);
+            var v = this.alphabeta(context.board, 2, -Infinity, Infinity, true);
+            context.registerMove(this, this.maximizingMove);
         };
-        AiPlayer.prototype.getTopCandidates = function (board, maxCandidates) {
+        AiPlayer.prototype.alphabeta = function (node, depth, alpha, beta, maximizingPlayer) {
+            if (depth == 0) {
+                return GobangOnline.computeHeuristicOfBoard(this.color, node);
+            }
+            if (maximizingPlayer) {
+                var v = -Infinity;
+                var moves = this.getTopCandidates(node, 3, true);
+                for (var i = 0; i < moves.length; i++) {
+                    var m = moves[i];
+                    node.setColorAt(m, this.color);
+                    v = Math.max(v, this.alphabeta(node, depth - 1, alpha, beta, !maximizingPlayer));
+                    node.revertLastMove();
+                    alpha = Math.max(alpha, v);
+                    if (alpha == v) {
+                        this.maximizingMove = m;
+                    }
+                    if (beta <= alpha) {
+                        break;
+                    }
+                }
+                return v;
+            }
+            else {
+                var v = Infinity;
+                var moves = this.getTopCandidates(node, 3, false);
+                for (var i = 0; i < moves.length; i++) {
+                    var m = moves[i];
+                    node.setColorAt(m, GobangOnline.getOpponentColor(this.color));
+                    v = Math.min(v, this.alphabeta(node, depth - 1, alpha, beta, !maximizingPlayer));
+                    node.revertLastMove();
+                    beta = Math.min(beta, v);
+                    if (beta <= alpha) {
+                        break;
+                    }
+                }
+                return v;
+            }
+        };
+        AiPlayer.prototype.getTopCandidates = function (board, maxCandidates, maximizingPlayer) {
             var candidates = this.getCandidates(board);
             var candidateHeuristics = [];
             for (var i = 0; i < candidates.length; i++) {
                 var move = candidates[i];
                 board.setColorAt(move, this.color);
-                candidateHeuristics.push([move, GobangOnline.computeHeuristicOfBoard(this, board)]);
+                candidateHeuristics.push([move, GobangOnline.computeHeuristicOfBoard(this.color, board)]);
                 board.revertLastMove();
             }
-            candidateHeuristics.sort(function (a, b) { return b[1] - a[1]; });
+            if (maximizingPlayer) {
+                candidateHeuristics.sort(function (a, b) { return b[1] - a[1]; });
+            }
+            else {
+                candidateHeuristics.sort(function (a, b) { return a[1] - b[1]; });
+            }
             var topCandidates = [];
             for (var i = 0; i < Math.min(maxCandidates, candidateHeuristics.length); i++) {
                 topCandidates.push(candidateHeuristics[i][0]);

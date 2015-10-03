@@ -5,6 +5,7 @@
 module GobangOnline {
   export class AiPlayer implements Player {
     public color: Color;
+    private maximizingMove: Move;
 
     constructor() {
 
@@ -17,23 +18,72 @@ module GobangOnline {
     takeTurn(context: Gobang, lastMove: Move): void {
       // console.log('heuristics: ' + computeHeuristicOfBoard(this, context.board));
 
-      var topCandidates = this.getTopCandidates(context.board, 1);
-      context.registerMove(this, topCandidates[0]);
-
+      var v = this.alphabeta(context.board, 2, -Infinity, Infinity, true);
+      context.registerMove(this, this.maximizingMove);
     }
 
-    getTopCandidates(board: Board, maxCandidates: number): Move[] {
+    alphabeta(node:Board, depth:number, alpha:number, beta:number, maximizingPlayer:boolean):number {
+      if (depth == 0) {
+        return computeHeuristicOfBoard(this.color, node);
+      }
+
+      if (maximizingPlayer) {
+        var v = -Infinity;
+
+        var moves = this.getTopCandidates(node, 3, true);
+        for (var i = 0; i < moves.length; i++) {
+          var m = moves[i];
+          node.setColorAt(m, this.color);
+          v = Math.max(v, this.alphabeta(node, depth-1, alpha, beta, !maximizingPlayer));
+          node.revertLastMove();
+          alpha = Math.max(alpha, v);
+
+          if (alpha == v) {
+            this.maximizingMove = m;
+          }
+
+          if (beta <= alpha) {
+            break;
+          }
+        }
+
+        return v;
+      } else {
+        var v = Infinity;
+
+        var moves = this.getTopCandidates(node, 3, false);
+        for (var i = 0; i < moves.length; i++) {
+          var m = moves[i];
+          node.setColorAt(m, getOpponentColor(this.color));
+          v = Math.min(v, this.alphabeta(node, depth-1, alpha, beta, !maximizingPlayer));
+          node.revertLastMove();
+          beta = Math.min(beta, v);
+          if (beta <= alpha) {
+            break;
+          }
+        }
+
+        return v;
+      }
+    }
+
+    getTopCandidates(board: Board, maxCandidates: number, maximizingPlayer:boolean): Move[] {
       var candidates = this.getCandidates(board);
       var candidateHeuristics = [];
 
       for (var i = 0; i < candidates.length; i++) {
         var move = candidates[i];
         board.setColorAt(move, this.color);
-        candidateHeuristics.push([move, computeHeuristicOfBoard(this, board)]);
+        candidateHeuristics.push([move, computeHeuristicOfBoard(this.color, board)]);
         board.revertLastMove();
       }
 
-      candidateHeuristics.sort(function(a, b) { return b[1]-a[1] });
+      if (maximizingPlayer) {
+        candidateHeuristics.sort(function(a, b) { return b[1]-a[1] });
+      } else {
+        candidateHeuristics.sort(function(a, b) { return a[1]-b[1] });
+      }
+      //console.log(candidateHeuristics);
       var topCandidates: Move[] = [];
 
       for (var i = 0; i < Math.min(maxCandidates, candidateHeuristics.length); i++) {
