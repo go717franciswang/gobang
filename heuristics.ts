@@ -40,7 +40,9 @@ module GobangOnline {
 
         if (node.children[ownership]) {
           node = node.children[ownership];
-          heuristics = Math.max(heuristics, getRivalScore ? node.rivalScore : node.score);
+          //heuristics = Math.max(heuristics, getRivalScore ? node.rivalScore : node.score);
+          heuristics = Math.max(heuristics, !getRivalScore ? node.rivalScore : node.score);
+          //heuristics = Math.max(heuristics, node.score);
         } else {
           break;
         }

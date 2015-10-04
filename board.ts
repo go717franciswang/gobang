@@ -25,7 +25,6 @@ module GobangOnline {
     }
 
     colorAt(move: Move): Color {
-      //console.log(move);
       return this.table[move.row][move.column];
     }
 

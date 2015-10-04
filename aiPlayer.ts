@@ -7,8 +7,8 @@ module GobangOnline {
     public color: Color;
     private maximizingMove: Move;
 
-    constructor() {
-
+    constructor(private depth:number, private maxCandidates:number) {
+      console.log(this.depth, this.maxCandidates);
     }
 
     setColor(color: Color) {
@@ -18,7 +18,8 @@ module GobangOnline {
     takeTurn(context: Gobang, lastMove: Move): void {
       // console.log('heuristics: ' + computeHeuristicOfBoard(this, context.board));
 
-      var v = this.alphabeta(context.board, 2, -Infinity, Infinity, true);
+      var v = this.alphabeta(context.board, this.depth, -Infinity, Infinity, true);
+      console.log(v, this.maximizingMove);
       context.registerMove(this, this.maximizingMove);
     }
 
@@ -29,18 +30,20 @@ module GobangOnline {
 
       if (maximizingPlayer) {
         var v = -Infinity;
+        var maximizingMove:Move;
 
-        var moves = this.getTopCandidates(node, 3, true);
+        var moves = this.getTopCandidates(node, this.maxCandidates, true);
         for (var i = 0; i < moves.length; i++) {
           var m = moves[i];
           node.setColorAt(m, this.color);
-          v = Math.max(v, this.alphabeta(node, depth-1, alpha, beta, !maximizingPlayer));
-          node.revertLastMove();
-          alpha = Math.max(alpha, v);
-
-          if (alpha == v) {
+          var tmp = this.alphabeta(node, depth-1, alpha, beta, !maximizingPlayer);
+          if (depth == this.depth && tmp > v) {
             this.maximizingMove = m;
           }
+          //console.log(depth, i, m, tmp)
+          v = Math.max(v, tmp);
+          node.revertLastMove();
+          alpha = Math.max(alpha, v);
 
           if (beta <= alpha) {
             break;
@@ -51,11 +54,13 @@ module GobangOnline {
       } else {
         var v = Infinity;
 
-        var moves = this.getTopCandidates(node, 3, false);
+        var moves = this.getTopCandidates(node, this.maxCandidates, false);
         for (var i = 0; i < moves.length; i++) {
           var m = moves[i];
           node.setColorAt(m, getOpponentColor(this.color));
-          v = Math.min(v, this.alphabeta(node, depth-1, alpha, beta, !maximizingPlayer));
+          var tmp = this.alphabeta(node, depth-1, alpha, beta, !maximizingPlayer);
+          //console.log(depth, i, m, tmp)
+          v = Math.min(v, tmp);
           node.revertLastMove();
           beta = Math.min(beta, v);
           if (beta <= alpha) {
@@ -109,6 +114,7 @@ module GobangOnline {
         candidates.push({ row: mid, column: mid });
       }
 
+      //console.log(candidates);
       return candidates;
     }
 

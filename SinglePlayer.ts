@@ -20,7 +20,7 @@ module GobangOnline {
       var scale: number = this.game.height / this.board.height;
       this.board.scale.setTo(scale, scale);
       this.humanPlayer = new HumanPlayer();
-      this.aiPlayer = new AiPlayer();
+      this.aiPlayer = new AiPlayer(2, 100);
       this.engine = new Gobang(16, this.humanPlayer, this.aiPlayer);
       this.engine.setOnRegisterMove((player, move) => {
         var pos = this.move2position(move);

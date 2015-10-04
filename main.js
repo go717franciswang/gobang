@@ -416,7 +416,7 @@ var GobangOnline;
                 }
                 if (node.children[ownership]) {
                     node = node.children[ownership];
-                    heuristics = Math.max(heuristics, getRivalScore ? node.rivalScore : node.score);
+                    heuristics = Math.max(heuristics, !getRivalScore ? node.rivalScore : node.score);
                 }
                 else {
                     break;
@@ -471,13 +471,17 @@ var GobangOnline;
 var GobangOnline;
 (function (GobangOnline) {
     var AiPlayer = (function () {
-        function AiPlayer() {
+        function AiPlayer(depth, maxCandidates) {
+            this.depth = depth;
+            this.maxCandidates = maxCandidates;
+            console.log(this.depth, this.maxCandidates);
         }
         AiPlayer.prototype.setColor = function (color) {
             this.color = color;
         };
         AiPlayer.prototype.takeTurn = function (context, lastMove) {
-            var v = this.alphabeta(context.board, 2, -Infinity, Infinity, true);
+            var v = this.alphabeta(context.board, this.depth, -Infinity, Infinity, true);
+            console.log(v, this.maximizingMove);
             context.registerMove(this, this.maximizingMove);
         };
         AiPlayer.prototype.alphabeta = function (node, depth, alpha, beta, maximizingPlayer) {
@@ -486,16 +490,18 @@ var GobangOnline;
             }
             if (maximizingPlayer) {
                 var v = -Infinity;
-                var moves = this.getTopCandidates(node, 3, true);
+                var maximizingMove;
+                var moves = this.getTopCandidates(node, this.maxCandidates, true);
                 for (var i = 0; i < moves.length; i++) {
                     var m = moves[i];
                     node.setColorAt(m, this.color);
-                    v = Math.max(v, this.alphabeta(node, depth - 1, alpha, beta, !maximizingPlayer));
-                    node.revertLastMove();
-                    alpha = Math.max(alpha, v);
-                    if (alpha == v) {
+                    var tmp = this.alphabeta(node, depth - 1, alpha, beta, !maximizingPlayer);
+                    if (depth == this.depth && tmp > v) {
                         this.maximizingMove = m;
                     }
+                    v = Math.max(v, tmp);
+                    node.revertLastMove();
+                    alpha = Math.max(alpha, v);
                     if (beta <= alpha) {
                         break;
                     }
@@ -504,11 +510,12 @@ var GobangOnline;
             }
             else {
                 var v = Infinity;
-                var moves = this.getTopCandidates(node, 3, false);
+                var moves = this.getTopCandidates(node, this.maxCandidates, false);
                 for (var i = 0; i < moves.length; i++) {
                     var m = moves[i];
                     node.setColorAt(m, GobangOnline.getOpponentColor(this.color));
-                    v = Math.min(v, this.alphabeta(node, depth - 1, alpha, beta, !maximizingPlayer));
+                    var tmp = this.alphabeta(node, depth - 1, alpha, beta, !maximizingPlayer);
+                    v = Math.min(v, tmp);
                     node.revertLastMove();
                     beta = Math.min(beta, v);
                     if (beta <= alpha) {
@@ -579,7 +586,7 @@ var GobangOnline;
             var scale = this.game.height / this.board.height;
             this.board.scale.setTo(scale, scale);
             this.humanPlayer = new GobangOnline.HumanPlayer();
-            this.aiPlayer = new GobangOnline.AiPlayer();
+            this.aiPlayer = new GobangOnline.AiPlayer(2, 100);
             this.engine = new GobangOnline.Gobang(16, this.humanPlayer, this.aiPlayer);
             this.engine.setOnRegisterMove(function (player, move) {
                 var pos = _this.move2position(move);
