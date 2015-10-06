@@ -17,15 +17,15 @@ module GobangOnline {
       this.add.tween(this.background).to({ alpha: 1.0 }, 2000, Phaser.Easing.Bounce.InOut, true);
 
       addButton(this.game, this.game.width/2, this.game.height/2-150, 'EASY', () => {
-        this.game.state.start('SinglePlayer');
+        this.game.state.start('SinglePlayer', true, false, 1);
       });
 
       addButton(this.game, this.game.width/2, this.game.height/2, 'MEDIUM', () => {
-        this.game.state.start('SinglePlayer');
+        this.game.state.start('SinglePlayer', true, false, 2);
       });
 
       addButton(this.game, this.game.width/2, this.game.height/2+150, 'HARD', () => {
-        this.game.state.start('SinglePlayer');
+        this.game.state.start('SinglePlayer', true, false, 3);
       });
     }
   }

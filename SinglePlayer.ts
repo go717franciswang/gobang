@@ -13,6 +13,11 @@ module GobangOnline {
     humanPlayer: HumanPlayer;
     aiPlayer: AiPlayer;
     engine: Gobang;
+    private aiDepth:number;
+
+    init(aiDepth) {
+      this.aiDepth = aiDepth;
+    }
 
     create() {
       this.board = this.add.sprite(this.game.width/2, this.game.height/2, 'board');
@@ -29,7 +34,7 @@ module GobangOnline {
         msg.anchor.setTo(0.5, 0.5);
       };
 
-      this.aiPlayer = new AiPlayer(2, 100);
+      this.aiPlayer = new AiPlayer(this.aiDepth, 100);
       this.engine = new Gobang(16, this.humanPlayer, this.aiPlayer);
       this.engine.setOnRegisterMove((player, move) => {
         var pos = this.move2position(move);

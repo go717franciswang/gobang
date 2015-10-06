@@ -75,13 +75,13 @@ var GobangOnline;
             this.background.scale.y = this.game.height / this.background.height;
             this.add.tween(this.background).to({ alpha: 1.0 }, 2000, Phaser.Easing.Bounce.InOut, true);
             GobangOnline.addButton(this.game, this.game.width / 2, this.game.height / 2 - 150, 'EASY', function () {
-                _this.game.state.start('SinglePlayer');
+                _this.game.state.start('SinglePlayer', true, false, 1);
             });
             GobangOnline.addButton(this.game, this.game.width / 2, this.game.height / 2, 'MEDIUM', function () {
-                _this.game.state.start('SinglePlayer');
+                _this.game.state.start('SinglePlayer', true, false, 2);
             });
             GobangOnline.addButton(this.game, this.game.width / 2, this.game.height / 2 + 150, 'HARD', function () {
-                _this.game.state.start('SinglePlayer');
+                _this.game.state.start('SinglePlayer', true, false, 3);
             });
         };
         return DifficultyMenu;
@@ -622,6 +622,9 @@ var GobangOnline;
         function SinglePlayer() {
             _super.apply(this, arguments);
         }
+        SinglePlayer.prototype.init = function (aiDepth) {
+            this.aiDepth = aiDepth;
+        };
         SinglePlayer.prototype.create = function () {
             var _this = this;
             this.board = this.add.sprite(this.game.width / 2, this.game.height / 2, 'board');
@@ -637,7 +640,7 @@ var GobangOnline;
                 var msg = _this.game.add.bitmapText(_this.game.width / 2, _this.game.height / 2, 'Castaway', 'YOU LOST!');
                 msg.anchor.setTo(0.5, 0.5);
             };
-            this.aiPlayer = new GobangOnline.AiPlayer(2, 100);
+            this.aiPlayer = new GobangOnline.AiPlayer(this.aiDepth, 100);
             this.engine = new GobangOnline.Gobang(16, this.humanPlayer, this.aiPlayer);
             this.engine.setOnRegisterMove(function (player, move) {
                 var pos = _this.move2position(move);
