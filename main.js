@@ -32,8 +32,10 @@ var GobangOnline;
             this.load.setPreloadSprite(this.preloadBar);
             this.load.image('menu', 'assets/menu.jpg');
             this.load.image('singlePlayerButton', 'assets/Play-button.gif');
+            this.load.image('button', 'assets/blue-button-hi.png');
             this.load.image('board', 'assets/board.jpg');
             this.load.spritesheet('piece', 'assets/pieces.png', 289, 289, 2);
+            this.load.bitmapFont('Castaway', 'assets/fonts/Castaway.png', 'assets/fonts/Castaway.xml');
         };
         Preloader.prototype.create = function () {
             var tween = this.add.tween(this.preloadBar).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);
@@ -45,6 +47,46 @@ var GobangOnline;
         return Preloader;
     })(Phaser.State);
     GobangOnline.Preloader = Preloader;
+    function addButton(game, x, y, text, callback) {
+        var button = game.add.button(x, y, 'button', callback);
+        button.anchor.setTo(0.5, 0.5);
+        button.scale.setTo(0.5, 0.5);
+        var bitmapText = game.add.bitmapText(x, y, 'Castaway', text);
+        bitmapText.anchor.setTo(0.5, 1);
+        var group = game.add.group();
+        group.addChild(button);
+        group.addChild(bitmapText);
+        return group;
+    }
+    GobangOnline.addButton = addButton;
+})(GobangOnline || (GobangOnline = {}));
+var GobangOnline;
+(function (GobangOnline) {
+    var DifficultyMenu = (function (_super) {
+        __extends(DifficultyMenu, _super);
+        function DifficultyMenu() {
+            _super.apply(this, arguments);
+        }
+        DifficultyMenu.prototype.create = function () {
+            var _this = this;
+            this.background = this.add.sprite(0, 0, 'menu');
+            this.background.alpha = 0;
+            this.background.scale.x = this.game.width / this.background.width;
+            this.background.scale.y = this.game.height / this.background.height;
+            this.add.tween(this.background).to({ alpha: 1.0 }, 2000, Phaser.Easing.Bounce.InOut, true);
+            GobangOnline.addButton(this.game, this.game.width / 2, this.game.height / 2 - 150, 'EASY', function () {
+                _this.game.state.start('SinglePlayer');
+            });
+            GobangOnline.addButton(this.game, this.game.width / 2, this.game.height / 2, 'MEDIUM', function () {
+                _this.game.state.start('SinglePlayer');
+            });
+            GobangOnline.addButton(this.game, this.game.width / 2, this.game.height / 2 + 150, 'HARD', function () {
+                _this.game.state.start('SinglePlayer');
+            });
+        };
+        return DifficultyMenu;
+    })(Phaser.State);
+    GobangOnline.DifficultyMenu = DifficultyMenu;
 })(GobangOnline || (GobangOnline = {}));
 var GobangOnline;
 (function (GobangOnline) {
@@ -60,12 +102,12 @@ var GobangOnline;
             this.background.scale.x = this.game.width / this.background.width;
             this.background.scale.y = this.game.height / this.background.height;
             this.add.tween(this.background).to({ alpha: 1.0 }, 2000, Phaser.Easing.Bounce.InOut, true);
-            this.singlePlayerButton = this.add.sprite(this.game.width / 2, this.game.height / 2, 'singlePlayerButton');
-            this.singlePlayerButton.anchor.setTo(0.5, 0.5);
-            this.singlePlayerButton.inputEnabled = true;
-            this.singlePlayerButton.events.onInputDown.add(function () {
-                _this.game.state.start('SinglePlayer');
-            }, this);
+            GobangOnline.addButton(this.game, this.game.width / 2, this.game.height / 2 - 100, 'SINGLE PLAYER', function () {
+                _this.game.state.start('DifficultyMenu');
+            });
+            GobangOnline.addButton(this.game, this.game.width / 2, this.game.height / 2 + 100, 'MULTI PLAYER', function () {
+                _this.game.state.start('MultiPlayer');
+            });
         };
         return MainMenu;
     })(Phaser.State);
@@ -460,9 +502,10 @@ var GobangOnline;
         HumanPlayer.prototype.badMove = function (context, badMove) {
         };
         HumanPlayer.prototype.win = function () {
-            console.log('human wins');
+            this.onWinCallback();
         };
         HumanPlayer.prototype.lose = function () {
+            this.onLossCallback();
         };
         return HumanPlayer;
     })();
@@ -586,6 +629,14 @@ var GobangOnline;
             var scale = this.game.height / this.board.height;
             this.board.scale.setTo(scale, scale);
             this.humanPlayer = new GobangOnline.HumanPlayer();
+            this.humanPlayer.onWinCallback = function () {
+                var msg = _this.game.add.bitmapText(_this.game.width / 2, _this.game.height / 2, 'Castaway', 'YOU WON!');
+                msg.anchor.setTo(0.5, 0.5);
+            };
+            this.humanPlayer.onLossCallback = function () {
+                var msg = _this.game.add.bitmapText(_this.game.width / 2, _this.game.height / 2, 'Castaway', 'YOU LOST!');
+                msg.anchor.setTo(0.5, 0.5);
+            };
             this.aiPlayer = new GobangOnline.AiPlayer(2, 100);
             this.engine = new GobangOnline.Gobang(16, this.humanPlayer, this.aiPlayer);
             this.engine.setOnRegisterMove(function (player, move) {
@@ -634,6 +685,7 @@ var GobangOnline;
             this.state.add('Boot', GobangOnline.Boot, false);
             this.state.add('Preloader', GobangOnline.Preloader, false);
             this.state.add('MainMenu', GobangOnline.MainMenu, false);
+            this.state.add('DifficultyMenu', GobangOnline.DifficultyMenu, false);
             this.state.add('SinglePlayer', GobangOnline.SinglePlayer, false);
             this.state.start('Boot');
         }

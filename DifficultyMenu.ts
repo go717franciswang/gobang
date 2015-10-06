@@ -4,7 +4,7 @@
 
 module GobangOnline {
 
-  export class MainMenu extends Phaser.State {
+  export class DifficultyMenu extends Phaser.State {
 
     background: Phaser.Sprite;
 
@@ -16,12 +16,16 @@ module GobangOnline {
 
       this.add.tween(this.background).to({ alpha: 1.0 }, 2000, Phaser.Easing.Bounce.InOut, true);
 
-      addButton(this.game, this.game.width/2, this.game.height/2-100, 'SINGLE PLAYER', () => {
-        this.game.state.start('DifficultyMenu');
+      addButton(this.game, this.game.width/2, this.game.height/2-150, 'EASY', () => {
+        this.game.state.start('SinglePlayer');
       });
 
-      addButton(this.game, this.game.width/2, this.game.height/2+100, 'MULTI PLAYER', () => {
-        this.game.state.start('MultiPlayer');
+      addButton(this.game, this.game.width/2, this.game.height/2, 'MEDIUM', () => {
+        this.game.state.start('SinglePlayer');
+      });
+
+      addButton(this.game, this.game.width/2, this.game.height/2+150, 'HARD', () => {
+        this.game.state.start('SinglePlayer');
       });
     }
   }

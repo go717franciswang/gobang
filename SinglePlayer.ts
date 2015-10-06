@@ -20,6 +20,15 @@ module GobangOnline {
       var scale: number = this.game.height / this.board.height;
       this.board.scale.setTo(scale, scale);
       this.humanPlayer = new HumanPlayer();
+      this.humanPlayer.onWinCallback = () => {
+        var msg = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'Castaway', 'YOU WON!');
+        msg.anchor.setTo(0.5, 0.5);
+      };
+      this.humanPlayer.onLossCallback = () => {
+        var msg = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'Castaway', 'YOU LOST!');
+        msg.anchor.setTo(0.5, 0.5);
+      };
+
       this.aiPlayer = new AiPlayer(2, 100);
       this.engine = new Gobang(16, this.humanPlayer, this.aiPlayer);
       this.engine.setOnRegisterMove((player, move) => {

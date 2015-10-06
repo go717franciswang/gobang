@@ -22,6 +22,7 @@
     ],
     "files": [
         "./Boot.ts",
+        "./DifficultyMenu.ts",
         "./Game.ts",
         "./MainMenu.ts",
         "./Preloader.ts",

@@ -8,6 +8,8 @@ module GobangOnline {
     public color: Color;
     public takingTurn: boolean;
     private context: Gobang;
+    public onWinCallback;
+    public onLossCallback;
 
     constructor() {
       this.takingTurn = false;
@@ -33,11 +35,11 @@ module GobangOnline {
     }
 
     win(): void {
-      console.log('human wins');
+      this.onWinCallback();
     }
 
     lose(): void {
-
+      this.onLossCallback();
     }
   }
 }
