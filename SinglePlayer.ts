@@ -15,13 +15,21 @@ module GobangOnline {
     engine: Gobang;
     private aiDepth:number;
     private pendingMove:Move;
+    private stageGroup:Phaser.Group;
+    private worldScale:number = 1;
+    private oldDistance:number;
+    private distance:number;
+    private oldCenter:{x:number; y:number};
+    private center:{x:number; y:number};
 
     init(aiDepth) {
       this.aiDepth = aiDepth;
     }
 
     create() {
+      this.stageGroup = this.game.add.group();
       this.board = this.add.sprite(this.game.width/2, this.game.height/2, 'board');
+      this.stageGroup.add(this.board);
       this.board.anchor.setTo(0.5, 0.5);
       var scale: number = this.game.height / this.board.height;
       this.board.scale.setTo(scale, scale);
@@ -46,6 +54,7 @@ module GobangOnline {
 
         piece.anchor.setTo(0.5, 0.5);
         piece.scale.setTo(0.12);
+        this.stageGroup.add(piece);
       });
       this.engine.startGame();
     }
@@ -65,7 +74,43 @@ module GobangOnline {
     }
 
     update() {
-      if (this.humanPlayer.takingTurn) {
+
+      // pinch-zoom described in
+      // http://www.html5gamedevs.com/topic/8762-zoom-outin-camera-as-seen-in-angry-birds/
+      if (this.input.pointer1.isDown && this.input.pointer2.isDown) {
+        this.oldCenter = this.center;
+        this.center = { x: (this.input.pointer1.x+this.input.pointer2.x)/2, y: (this.input.pointer1.y+this.input.pointer2.y)/2 };
+        this.oldDistance = this.distance;
+        this.distance = Phaser.Math.distance(this.input.pointer1.x, this.input.pointer1.y, this.input.pointer2.x, this.input.pointer2.y);
+        var delta = Math.abs(this.oldDistance - this.distance);
+
+        // zoom
+        if (delta > 4) {
+          if (this.oldDistance < this.distance) {
+            this.worldScale -= 0.02;
+          } else {
+            this.worldScale += 0.02;
+          }
+
+          this.worldScale = Phaser.Math.clamp(this.worldScale, 0.5, 1.5);
+          this.stageGroup.scale.set(this.worldScale);
+
+        // follow
+        } else {
+          if (Math.abs(this.center.x - this.oldCenter.x) > 4) {
+            if (this.center.x > this.oldCenter.x) {
+              this.camera.x += 4;
+            }
+          }
+
+          if (Math.abs(this.center.y - this.oldCenter.y) > 4) {
+            if (this.center.y > this.oldCenter.y) {
+              this.camera.y += 4;
+            }
+          }
+        }
+
+      } else if (this.humanPlayer.takingTurn) {
         var move = this.position2move(this.game.input.activePointer);
 
         if (this.game.input.activePointer.isDown) {

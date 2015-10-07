@@ -9,6 +9,8 @@ module GobangOnline {
     }
 
     create() {
+      this.scale.scaleMode = Phaser.ScaleManager.NO_SCALE;
+      this.scale.refresh();
       this.game.state.start('Preloader', true, false);
     }
   }
