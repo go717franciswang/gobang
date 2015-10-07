@@ -667,11 +667,17 @@ var GobangOnline;
         };
         SinglePlayer.prototype.update = function () {
             if (this.humanPlayer.takingTurn) {
+                var move = this.position2move(this.game.input.activePointer);
                 if (this.game.input.activePointer.isDown) {
-                    var move = this.position2move(this.game.input.activePointer);
-                    if (this.engine.board.isMoveValid(move)) {
+                    if (this.engine.board.isMoveValid(move) && !this.pendingMove) {
+                        this.pendingMove = move;
+                    }
+                }
+                else {
+                    if (this.pendingMove && this.pendingMove.row == move.row && this.pendingMove.column == move.column) {
                         this.humanPlayer.makeMove(move);
                     }
+                    this.pendingMove = null;
                 }
             }
         };
