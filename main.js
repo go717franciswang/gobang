@@ -11,7 +11,7 @@ var GobangOnline;
             _super.apply(this, arguments);
         }
         Boot.prototype.preload = function () {
-            this.load.image('preloadBar', 'assets/loader.png');
+            this.load.image('preloadBar', '/resources/gobang/loader.png');
         };
         Boot.prototype.create = function () {
             this.game.state.start('Preloader', true, false);
@@ -30,12 +30,12 @@ var GobangOnline;
         Preloader.prototype.preload = function () {
             this.preloadBar = this.add.sprite(200, 250, 'preloadBar');
             this.load.setPreloadSprite(this.preloadBar);
-            this.load.image('menu', 'assets/menu.jpg');
-            this.load.image('singlePlayerButton', 'assets/Play-button.gif');
-            this.load.image('button', 'assets/blue-button-hi.png');
-            this.load.image('board', 'assets/board.jpg');
-            this.load.spritesheet('piece', 'assets/pieces.png', 289, 289, 2);
-            this.load.bitmapFont('Castaway', 'assets/fonts/Castaway.png', 'assets/fonts/Castaway.xml');
+            this.load.image('menu', '/resources/gobang/menu.jpg');
+            this.load.image('singlePlayerButton', '/resources/gobang/Play-button.gif');
+            this.load.image('button', '/resources/gobang/blue-button-hi.png');
+            this.load.image('board', '/resources/gobang/board.jpg');
+            this.load.spritesheet('piece', '/resources/gobang/pieces.png', 289, 289, 2);
+            this.load.bitmapFont('Castaway', '/resources/gobang/fonts/Castaway.png', '/resources/gobang/fonts/Castaway.xml');
         };
         Preloader.prototype.create = function () {
             var tween = this.add.tween(this.preloadBar).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);

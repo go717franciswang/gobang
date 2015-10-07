@@ -11,12 +11,12 @@ module GobangOnline {
       this.preloadBar = this.add.sprite(200, 250, 'preloadBar');
       this.load.setPreloadSprite(this.preloadBar);
 
-      this.load.image('menu', 'assets/menu.jpg');
-      this.load.image('singlePlayerButton', 'assets/Play-button.gif');
-      this.load.image('button', 'assets/blue-button-hi.png');
-      this.load.image('board', 'assets/board.jpg');
-      this.load.spritesheet('piece', 'assets/pieces.png', 289, 289, 2);
-      this.load.bitmapFont('Castaway', 'assets/fonts/Castaway.png', 'assets/fonts/Castaway.xml');
+      this.load.image('menu', '/resources/gobang/menu.jpg');
+      this.load.image('singlePlayerButton', '/resources/gobang/Play-button.gif');
+      this.load.image('button', '/resources/gobang/blue-button-hi.png');
+      this.load.image('board', '/resources/gobang/board.jpg');
+      this.load.spritesheet('piece', '/resources/gobang/pieces.png', 289, 289, 2);
+      this.load.bitmapFont('Castaway', '/resources/gobang/fonts/Castaway.png', '/resources/gobang/fonts/Castaway.xml');
     }
 
     create() {
