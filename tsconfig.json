@@ -25,7 +25,10 @@
         "./DifficultyMenu.ts",
         "./Game.ts",
         "./MainMenu.ts",
+        "./MediaStream.d.ts",
+        "./MultiPlayer.ts",
         "./Preloader.ts",
+        "./RTCPeerConnection.d.ts",
         "./SinglePlayer.ts",
         "./aiPlayer.ts",
         "./board.ts",
@@ -36,6 +39,7 @@
         "./p2.d.ts",
         "./patternScores.ts",
         "./patternSearchTree.ts",
+        "./peerjs.d.ts",
         "./phaser.d.ts",
         "./pixi.d.ts",
         "./player.ts"

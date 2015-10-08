@@ -722,6 +722,29 @@ var GobangOnline;
 })(GobangOnline || (GobangOnline = {}));
 var GobangOnline;
 (function (GobangOnline) {
+    var MultiPlayer = (function (_super) {
+        __extends(MultiPlayer, _super);
+        function MultiPlayer() {
+            _super.apply(this, arguments);
+        }
+        MultiPlayer.prototype.create = function () {
+            this.createServerIfNotExist();
+        };
+        MultiPlayer.prototype.createServerIfNotExist = function () {
+            this.server = new Peer('server', { key: 'swe48rh5c9l1h5mi' });
+            this.server.on('error', function (e) {
+                console.log(e);
+            });
+            this.server.on('open', function () {
+                console.log('server created!');
+            });
+        };
+        return MultiPlayer;
+    })(Phaser.State);
+    GobangOnline.MultiPlayer = MultiPlayer;
+})(GobangOnline || (GobangOnline = {}));
+var GobangOnline;
+(function (GobangOnline) {
     var Game = (function (_super) {
         __extends(Game, _super);
         function Game() {
@@ -730,6 +753,7 @@ var GobangOnline;
             this.state.add('Preloader', GobangOnline.Preloader, false);
             this.state.add('MainMenu', GobangOnline.MainMenu, false);
             this.state.add('DifficultyMenu', GobangOnline.DifficultyMenu, false);
+            this.state.add('MultiPlayer', GobangOnline.MultiPlayer, false);
             this.state.add('SinglePlayer', GobangOnline.SinglePlayer, false);
             this.state.start('Boot');
         }
