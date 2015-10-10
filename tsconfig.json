@@ -35,6 +35,7 @@
         "./gobang.ts",
         "./heuristics.ts",
         "./humanPlayer.ts",
+        "./message.ts",
         "./move.ts",
         "./p2.d.ts",
         "./patternScores.ts",
@@ -42,6 +43,7 @@
         "./peerjs.d.ts",
         "./phaser.d.ts",
         "./pixi.d.ts",
-        "./player.ts"
+        "./player.ts",
+        "./remotePlayer.ts"
     ]
 }
