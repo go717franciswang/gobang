@@ -5,11 +5,12 @@
 /// <reference path="./peerjs.d.ts"/>
 /// <reference path="./remotePlayer.ts"/>
 /// <reference path="./message.ts"/>
+/// <reference path="./board.ts"/>
 
 module GobangOnline {
-  enum MsgType { GameReady, YourTurn, Move };
   var API_KEY = 'swe48rh5c9l1h5mi';
   var ROOMID = 'server';
+  var BOARD_SIZE = 16;
 
   export class MultiPlayer extends Phaser.State {
     board:Phaser.Sprite;
@@ -23,6 +24,9 @@ module GobangOnline {
     private connToServer:PeerJs.DataConnection;
 
     private takingTurn = false;
+    private pendingMove:Move;
+    private blackTurn = true;
+    private localBoard:Board;
 
     create() {
       this.board = this.add.sprite(this.game.width/2, this.game.height/2, 'board');
@@ -30,6 +34,7 @@ module GobangOnline {
       var scale: number = this.game.height / this.board.height;
       this.board.scale.setTo(scale, scale);
       this.createServerIfNotExist();
+      this.localBoard = new Board(BOARD_SIZE);
     }
 
     createServerIfNotExist() {
@@ -43,18 +48,24 @@ module GobangOnline {
       });
 
       this.server.on('open', () => {
+        this.connToClients = [];
         console.log('server created!');
         this.createClient();
 
         this.server.on('connection', (conn) => {
+          console.log('someone joined');
           this.connToClients.push(conn);
           this.handleConnectionToClient(conn);
 
           if (this.connToClients.length == 2) {
-            this.remotePlayer1 = new RemotePlayer(this.connToClients[0]);
-            this.remotePlayer2 = new RemotePlayer(this.connToClients[1]);
-            this.engine = new Gobang(16, this.remotePlayer1, this.remotePlayer2);
-            this.broadCast({ type: GobangOnline.MsgType.GameReady });
+            console.log('got enough players');
+            console.log('game start in 1 second');
+            setTimeout(() => {
+              this.remotePlayer1 = new RemotePlayer(this.connToClients[0]);
+              this.remotePlayer2 = new RemotePlayer(this.connToClients[1]);
+              this.engine = new Gobang(BOARD_SIZE, this.remotePlayer1, this.remotePlayer2);
+              this.engine.startGame();
+            }, 1000);
           }
         });
       });
@@ -72,9 +83,12 @@ module GobangOnline {
       });
 
       conn.on('data', (data) => {
+        console.log('server got message: ', data);
         switch(data.type) {
           case MsgType.Move:
-            // make move
+            var move:Move = data.move;
+            this.broadCast({ type: GobangOnline.MsgType.Move, move: move });
+            this.engine.pendingPlayer.makeMove(move);
           break;
         }
       });
@@ -88,7 +102,7 @@ module GobangOnline {
       });
 
       this.client.on('open', () => {
-        this.connToServer = this.client.connect(ROOMID);
+        this.connToServer = this.client.connect(ROOMID, { reliable: true });
 
         this.connToServer.on('open', () => {
           this.handleConnectionToServer();
@@ -103,16 +117,64 @@ module GobangOnline {
       });
 
       this.connToServer.on('data', (data) => {
+        console.log('client got message: ', data);
         switch(data.type) {
-          case MsgType.GameReady:
-          break;
           case GobangOnline.MsgType.TakeTurn:
             this.takingTurn = true;
           break;
           case MsgType.Move:
+            var move:Move = data.move;
+            var pos = this.move2position(move);
+            var piece = this.add.sprite(pos.x, pos.y, 'piece');
+            if (!this.blackTurn) {
+              piece.frame = 1;
+            }
+
+            piece.anchor.setTo(0.5, 0.5);
+            piece.scale.setTo(0.12);
+
+            if (this.blackTurn) {
+              this.localBoard.setColorAt(move, Color.Black);
+            } else {
+              this.localBoard.setColorAt(move, Color.White);
+            }
+
+            this.blackTurn = !this.blackTurn;
           break;
         }
       });
+    }
+
+    update() {
+      if (this.takingTurn) {
+        var move = this.position2move(this.game.input.activePointer);
+
+        if (this.game.input.activePointer.isDown) {
+          if (this.localBoard.isMoveValid(move) && !this.pendingMove) {
+            this.pendingMove = move;
+          }
+        } else {
+          if (this.pendingMove && this.pendingMove.row == move.row && this.pendingMove.column == move.column) {
+            this.connToServer.send({ type: MsgType.Move, move: move });
+            this.takingTurn = false;
+          }
+          this.pendingMove = null;
+        }
+      }
+    }
+
+    position2move(position: { x: number; y: number }): Move {
+      return {
+        row: Math.round((position.y-35)/(525/15)),
+        column: Math.round((position.x-135)/(525/15))
+      };
+    }
+
+    move2position(move: Move): { x: number; y: number } {
+      return {
+        x: move.column*525/15+135,
+        y: move.row*525/15+35
+      };
     }
   }
 }

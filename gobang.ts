@@ -6,18 +6,20 @@ module GobangOnline {
 
   export class Gobang {
     public board: Board;
-    private pendingPlayer: Player;
+    public pendingPlayer: Player;
     private nonPendingPlayer: Player;
-    private onRegisterMove: any;
+    private onRegisterMove:Function;
     private gameOver: boolean = false;
 
     constructor(public size: number, public player1: Player, public player2: Player) {
       this.board = new Board(size);
 
       if (Math.floor(Math.random()*2) == 0) {
+        console.log('player 1\'s turn');
         this.pendingPlayer = player1;
         this.nonPendingPlayer = player2;
       } else {
+        console.log('player 2\'s turn');
         this.nonPendingPlayer = player1;
         this.pendingPlayer = player2;
       }
@@ -53,7 +55,9 @@ module GobangOnline {
       this.swapPlayingPendingState();
       this.pendingPlayer.takeTurn(this, move);
 
-      this.onRegisterMove(player, move);
+      if (this.onRegisterMove) {
+        this.onRegisterMove(player, move);
+      }
     }
 
     swapPlayingPendingState(): void {

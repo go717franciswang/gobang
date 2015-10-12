@@ -17,10 +17,12 @@ module GobangOnline {
     }
 
     takeTurn(context:Gobang, lastMove:Move): void {
+      this.context = context;
       this.conn.send({ type: MsgType.TakeTurn, lastMove: lastMove });
     }
 
     makeMove(move:Move) {
+      this.context.registerMove(this, move);
     }
 
     badMove(context:Gobang, badMove:Move): void {
