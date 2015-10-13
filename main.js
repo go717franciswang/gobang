@@ -878,12 +878,9 @@ var GobangOnline;
                         _this.blackTurn = !_this.blackTurn;
                         break;
                     case GobangOnline.MsgType.GameOver:
-                        if (data.winnerColor == GobangOnline.Color.Black) {
-                            console.log('black wins');
-                        }
-                        else {
-                            console.log('white wins');
-                        }
+                        var txt = data.winnerColor == GobangOnline.Color.Black ? 'BLACK WINS' : 'WHITE WINS';
+                        var msg = _this.game.add.bitmapText(_this.game.width / 2, _this.game.height / 2, 'Castaway', txt);
+                        msg.anchor.setTo(0.5, 0.5);
                         break;
                 }
             });
