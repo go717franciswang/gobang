@@ -65,6 +65,10 @@ module GobangOnline {
               this.remotePlayer2 = new RemotePlayer(this.connToClients[1]);
               this.engine = new Gobang(BOARD_SIZE, this.remotePlayer1, this.remotePlayer2);
               this.engine.startGame();
+
+              this.engine.onGameOver = () => {
+                this.broadCast({ type: MsgType.GameOver, winnerColor: this.engine.pendingPlayer.color });
+              };
             }, 1000);
           }
         });
@@ -140,6 +144,13 @@ module GobangOnline {
             }
 
             this.blackTurn = !this.blackTurn;
+          break;
+          case MsgType.GameOver:
+            if (data.winnerColor == Color.Black) {
+              console.log('black wins');
+            } else {
+              console.log('white wins');
+            }
           break;
         }
       });

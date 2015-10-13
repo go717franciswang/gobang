@@ -216,6 +216,10 @@ var GobangOnline;
                 this.gameOver = true;
                 player.win();
                 this.nonPendingPlayer.lose();
+                if (this.onGameOver) {
+                    this.onGameOver();
+                }
+                return;
             }
             this.swapPlayingPendingState();
             this.pendingPlayer.takeTurn(this, move);
@@ -729,6 +733,7 @@ var GobangOnline;
     (function (MsgType) {
         MsgType[MsgType["TakeTurn"] = 0] = "TakeTurn";
         MsgType[MsgType["Move"] = 1] = "Move";
+        MsgType[MsgType["GameOver"] = 2] = "GameOver";
     })(GobangOnline.MsgType || (GobangOnline.MsgType = {}));
     var MsgType = GobangOnline.MsgType;
     ;
@@ -804,6 +809,9 @@ var GobangOnline;
                             _this.remotePlayer2 = new GobangOnline.RemotePlayer(_this.connToClients[1]);
                             _this.engine = new GobangOnline.Gobang(BOARD_SIZE, _this.remotePlayer1, _this.remotePlayer2);
                             _this.engine.startGame();
+                            _this.engine.onGameOver = function () {
+                                _this.broadCast({ type: GobangOnline.MsgType.GameOver, winnerColor: _this.engine.pendingPlayer.color });
+                            };
                         }, 1000);
                     }
                 });
@@ -868,6 +876,14 @@ var GobangOnline;
                             _this.localBoard.setColorAt(move, GobangOnline.Color.White);
                         }
                         _this.blackTurn = !_this.blackTurn;
+                        break;
+                    case GobangOnline.MsgType.GameOver:
+                        if (data.winnerColor == GobangOnline.Color.Black) {
+                            console.log('black wins');
+                        }
+                        else {
+                            console.log('white wins');
+                        }
                         break;
                 }
             });

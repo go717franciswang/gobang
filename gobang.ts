@@ -9,6 +9,7 @@ module GobangOnline {
     public pendingPlayer: Player;
     private nonPendingPlayer: Player;
     private onRegisterMove:Function;
+    public onGameOver:Function;
     private gameOver: boolean = false;
 
     constructor(public size: number, public player1: Player, public player2: Player) {
@@ -51,7 +52,13 @@ module GobangOnline {
         this.gameOver = true;
         player.win();
         this.nonPendingPlayer.lose();
+
+        if (this.onGameOver) {
+          this.onGameOver();
+        }
+        return;
       }
+
       this.swapPlayingPendingState();
       this.pendingPlayer.takeTurn(this, move);
 
