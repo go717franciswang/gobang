@@ -94,8 +94,25 @@ module GobangOnline {
             this.broadCast({ type: GobangOnline.MsgType.Move, move: move });
             this.engine.pendingPlayer.makeMove(move);
           break;
+          case MsgType.NewPlayer:
+            if (this.isFirstClient(conn)) {
+              this.connToClients[0].send({ type: MsgType.PopupText, text: 'WAITING FOR ANOTHER PLAYER' });
+            } else if (this.isSecondClient(conn)) {
+              this.broadCast({ type: MsgType.PopupText, text: 'GAME IS READY' });
+            } else {
+              this.broadCast({ type: MsgType.PopupText, text: 'AN OBSERVER HAS ENTERED' });
+            }
+          break;
         }
       });
+    }
+
+    isFirstClient(conn:PeerJs.DataConnection) {
+      return conn.peer == this.connToClients[0].peer;
+    }
+
+    isSecondClient(conn:PeerJs.DataConnection) {
+      return conn.peer == this.connToClients[1].peer;
     }
 
     createClient() {
@@ -111,6 +128,7 @@ module GobangOnline {
         this.connToServer.on('open', () => {
           this.handleConnectionToServer();
           this.client.disconnect();
+          this.connToServer.send({ type: MsgType.NewPlayer });
         });
       });
     }
@@ -149,6 +167,11 @@ module GobangOnline {
             var txt = data.winnerColor == Color.Black ? 'BLACK WINS' : 'WHITE WINS';
             var msg = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'Castaway', txt);
             msg.anchor.setTo(0.5, 0.5);
+          break;
+          case MsgType.PopupText:
+            var msg = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'Castaway', data.text);
+            msg.anchor.setTo(0.5, 0.5);
+            this.add.tween(msg).to({ alpha: 0 }, 700, null, true, 1000);
           break;
         }
       });

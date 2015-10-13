@@ -734,6 +734,8 @@ var GobangOnline;
         MsgType[MsgType["TakeTurn"] = 0] = "TakeTurn";
         MsgType[MsgType["Move"] = 1] = "Move";
         MsgType[MsgType["GameOver"] = 2] = "GameOver";
+        MsgType[MsgType["NewPlayer"] = 3] = "NewPlayer";
+        MsgType[MsgType["PopupText"] = 4] = "PopupText";
     })(GobangOnline.MsgType || (GobangOnline.MsgType = {}));
     var MsgType = GobangOnline.MsgType;
     ;
@@ -834,8 +836,25 @@ var GobangOnline;
                         _this.broadCast({ type: GobangOnline.MsgType.Move, move: move });
                         _this.engine.pendingPlayer.makeMove(move);
                         break;
+                    case GobangOnline.MsgType.NewPlayer:
+                        if (_this.isFirstClient(conn)) {
+                            _this.connToClients[0].send({ type: GobangOnline.MsgType.PopupText, text: 'WAITING FOR ANOTHER PLAYER' });
+                        }
+                        else if (_this.isSecondClient(conn)) {
+                            _this.broadCast({ type: GobangOnline.MsgType.PopupText, text: 'GAME IS READY' });
+                        }
+                        else {
+                            _this.broadCast({ type: GobangOnline.MsgType.PopupText, text: 'AN OBSERVER HAS ENTERED' });
+                        }
+                        break;
                 }
             });
+        };
+        MultiPlayer.prototype.isFirstClient = function (conn) {
+            return conn.peer == this.connToClients[0].peer;
+        };
+        MultiPlayer.prototype.isSecondClient = function (conn) {
+            return conn.peer == this.connToClients[1].peer;
         };
         MultiPlayer.prototype.createClient = function () {
             var _this = this;
@@ -847,6 +866,7 @@ var GobangOnline;
                 _this.connToServer.on('open', function () {
                     _this.handleConnectionToServer();
                     _this.client.disconnect();
+                    _this.connToServer.send({ type: GobangOnline.MsgType.NewPlayer });
                 });
             });
         };
@@ -881,6 +901,11 @@ var GobangOnline;
                         var txt = data.winnerColor == GobangOnline.Color.Black ? 'BLACK WINS' : 'WHITE WINS';
                         var msg = _this.game.add.bitmapText(_this.game.width / 2, _this.game.height / 2, 'Castaway', txt);
                         msg.anchor.setTo(0.5, 0.5);
+                        break;
+                    case GobangOnline.MsgType.PopupText:
+                        var msg = _this.game.add.bitmapText(_this.game.width / 2, _this.game.height / 2, 'Castaway', data.text);
+                        msg.anchor.setTo(0.5, 0.5);
+                        _this.add.tween(msg).to({ alpha: 0 }, 700, null, true, 1000);
                         break;
                 }
             });
