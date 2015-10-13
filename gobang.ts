@@ -11,6 +11,8 @@ module GobangOnline {
     private onRegisterMove:Function;
     public onGameOver:Function;
     private gameOver: boolean = false;
+    public blackPlayer:Player;
+    public whitePlayer:Player;
 
     constructor(public size: number, public player1: Player, public player2: Player) {
       this.board = new Board(size);
@@ -27,6 +29,8 @@ module GobangOnline {
 
       this.pendingPlayer.setColor(Color.Black);
       this.nonPendingPlayer.setColor(Color.White);
+      this.blackPlayer = this.pendingPlayer;
+      this.whitePlayer = this.nonPendingPlayer;
     }
 
     startGame() {

@@ -64,6 +64,8 @@ module GobangOnline {
               this.remotePlayer1 = new RemotePlayer(this.connToClients[0]);
               this.remotePlayer2 = new RemotePlayer(this.connToClients[1]);
               this.engine = new Gobang(BOARD_SIZE, this.remotePlayer1, this.remotePlayer2);
+              this.engine.blackPlayer.send({ type: MsgType.PopupText, text: 'GAME BEGAN\nYOU ARE BLACK' });
+              this.engine.whitePlayer.send({ type: MsgType.PopupText, text: 'GAME BEGAN\nYOU ARE WHITE' });
               this.engine.startGame();
 
               this.engine.onGameOver = () => {

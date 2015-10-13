@@ -12,6 +12,10 @@ module GobangOnline {
     constructor(private conn:PeerJs.DataConnection) {
     }
 
+    send(msg:Message) {
+      this.conn.send(msg);
+    }
+
     setColor(color:Color) {
       this.color = color;
     }

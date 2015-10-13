@@ -196,6 +196,8 @@ var GobangOnline;
             }
             this.pendingPlayer.setColor(GobangOnline.Color.Black);
             this.nonPendingPlayer.setColor(GobangOnline.Color.White);
+            this.blackPlayer = this.pendingPlayer;
+            this.whitePlayer = this.nonPendingPlayer;
         }
         Gobang.prototype.startGame = function () {
             this.pendingPlayer.takeTurn(this, null);
@@ -746,6 +748,9 @@ var GobangOnline;
         function RemotePlayer(conn) {
             this.conn = conn;
         }
+        RemotePlayer.prototype.send = function (msg) {
+            this.conn.send(msg);
+        };
         RemotePlayer.prototype.setColor = function (color) {
             this.color = color;
         };
@@ -810,6 +815,8 @@ var GobangOnline;
                             _this.remotePlayer1 = new GobangOnline.RemotePlayer(_this.connToClients[0]);
                             _this.remotePlayer2 = new GobangOnline.RemotePlayer(_this.connToClients[1]);
                             _this.engine = new GobangOnline.Gobang(BOARD_SIZE, _this.remotePlayer1, _this.remotePlayer2);
+                            _this.engine.blackPlayer.send({ type: GobangOnline.MsgType.PopupText, text: 'GAME BEGAN\nYOU ARE BLACK' });
+                            _this.engine.whitePlayer.send({ type: GobangOnline.MsgType.PopupText, text: 'GAME BEGAN\nYOU ARE WHITE' });
                             _this.engine.startGame();
                             _this.engine.onGameOver = function () {
                                 _this.broadCast({ type: GobangOnline.MsgType.GameOver, winnerColor: _this.engine.pendingPlayer.color });
