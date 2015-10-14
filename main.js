@@ -820,6 +820,9 @@ var GobangOnline;
                             _this.engine.startGame();
                             _this.engine.onGameOver = function () {
                                 _this.broadCast({ type: GobangOnline.MsgType.GameOver, winnerColor: _this.engine.pendingPlayer.color });
+                                setTimeout(function () {
+                                    _this.server.destroy();
+                                }, 1000);
                             };
                         }, 1000);
                     }

@@ -70,6 +70,9 @@ module GobangOnline {
 
               this.engine.onGameOver = () => {
                 this.broadCast({ type: MsgType.GameOver, winnerColor: this.engine.pendingPlayer.color });
+                setTimeout(() => {
+                  this.server.destroy();
+                }, 1000);
               };
             }, 1000);
           }
