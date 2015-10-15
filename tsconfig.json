@@ -44,6 +44,7 @@
         "./phaser.d.ts",
         "./pixi.d.ts",
         "./player.ts",
-        "./remotePlayer.ts"
+        "./remotePlayer.ts",
+        "./settings.ts"
     ]
 }

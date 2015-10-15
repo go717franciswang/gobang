@@ -5,6 +5,7 @@ interface Player {
   setColor(color: number): void;
   takeTurn(context: Gobang, lastMove: Move): void;
   makeMove?(move:Move):void;
+  onTakeTurnCallback?:Function;
   send?(msg:Message):void;
   badMove(context: Gobang, badMove: Move): void;
   win(): void;

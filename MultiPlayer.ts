@@ -6,11 +6,10 @@
 /// <reference path="./remotePlayer.ts"/>
 /// <reference path="./message.ts"/>
 /// <reference path="./board.ts"/>
+/// <reference path="./settings.ts"/>
 
 module GobangOnline {
-  var API_KEY = 'swe48rh5c9l1h5mi';
-  var ROOMID = 'server';
-  var BOARD_SIZE = 16;
+
 
   export class MultiPlayer extends Phaser.State {
     board:Phaser.Sprite;
@@ -27,6 +26,8 @@ module GobangOnline {
     private pendingMove:Move;
     private blackTurn = true;
     private localBoard:Board;
+    private timer:Phaser.Text;
+    private turnBeganAt:number;
 
     create() {
       this.board = this.add.sprite(this.game.width/2, this.game.height/2, 'board');
@@ -34,11 +35,11 @@ module GobangOnline {
       var scale: number = this.game.height / this.board.height;
       this.board.scale.setTo(scale, scale);
       this.createServerIfNotExist();
-      this.localBoard = new Board(BOARD_SIZE);
+      this.localBoard = new Board(Settings.BOARD_SIZE);
     }
 
     createServerIfNotExist() {
-      this.server = new Peer(ROOMID, { key: API_KEY });
+      this.server = new Peer(Settings.ROOMID, { key: Settings.API_KEY });
 
       this.server.on('error', (e) => {
         console.log(e);
@@ -63,21 +64,44 @@ module GobangOnline {
             setTimeout(() => {
               this.remotePlayer1 = new RemotePlayer(this.connToClients[0]);
               this.remotePlayer2 = new RemotePlayer(this.connToClients[1]);
-              this.engine = new Gobang(BOARD_SIZE, this.remotePlayer1, this.remotePlayer2);
+              this.engine = new Gobang(Settings.BOARD_SIZE, this.remotePlayer1, this.remotePlayer2);
               this.engine.blackPlayer.send({ type: MsgType.PopupText, text: 'GAME BEGAN\nYOU ARE BLACK' });
               this.engine.whitePlayer.send({ type: MsgType.PopupText, text: 'GAME BEGAN\nYOU ARE WHITE' });
+
+              this.engine.blackPlayer.onTakeTurnCallback = (moveCountBeforeTurn:number) => {
+                setTimeout(() => {
+                  // if no new move was made after many seconds
+                  if (moveCountBeforeTurn == this.engine.board.getMoveCount()) {
+                    this.declareWinner(Color.White);
+                  }
+                }, (Settings.MAX_WAIT_PER_MOVE+1)*1000);
+              };
+
+              this.engine.whitePlayer.onTakeTurnCallback = (moveCountBeforeTurn:number) => {
+                setTimeout(() => {
+                  // if no new move was made after many seconds
+                  if (moveCountBeforeTurn == this.engine.board.getMoveCount()) {
+                    this.declareWinner(Color.Black);
+                  }
+                }, (Settings.MAX_WAIT_PER_MOVE+1)*1000);
+              };
+
               this.engine.startGame();
 
               this.engine.onGameOver = () => {
-                this.broadCast({ type: MsgType.GameOver, winnerColor: this.engine.pendingPlayer.color });
-                setTimeout(() => {
-                  this.server.destroy();
-                }, 1000);
+                this.declareWinner(this.engine.pendingPlayer.color);
               };
             }, 1000);
           }
         });
       });
+    }
+
+    declareWinner(winnerColor) {
+      this.broadCast({ type: MsgType.GameOver, winnerColor: winnerColor });
+      setTimeout(() => {
+        this.server.destroy();
+      }, 1000);
     }
 
     broadCast(msg:Message) {
@@ -121,14 +145,14 @@ module GobangOnline {
     }
 
     createClient() {
-      this.client = new Peer({ key: API_KEY });
+      this.client = new Peer({ key: Settings.API_KEY });
 
       this.client.on('error', () => {
 
       });
 
       this.client.on('open', () => {
-        this.connToServer = this.client.connect(ROOMID, { reliable: true });
+        this.connToServer = this.client.connect(Settings.ROOMID, { reliable: true });
 
         this.connToServer.on('open', () => {
           this.handleConnectionToServer();
@@ -148,6 +172,11 @@ module GobangOnline {
         switch(data.type) {
           case GobangOnline.MsgType.TakeTurn:
             this.takingTurn = true;
+            this.turnBeganAt = (new Date()).getTime();
+            var style = { font: "bold 32px Arial", fill: "#fff", boundsAlignH: "center", boundsAlignV: "middle" };
+            this.timer = this.add.text(this.game.width-25, 0, Settings.MAX_WAIT_PER_MOVE.toString(), style);
+            this.timer.anchor.setTo(1, 0);
+
           break;
           case MsgType.Move:
             var move:Move = data.move;
@@ -185,6 +214,8 @@ module GobangOnline {
     update() {
       if (this.takingTurn) {
         var move = this.position2move(this.game.input.activePointer);
+        var secondsLeft = Math.max(0, Settings.MAX_WAIT_PER_MOVE - Math.floor((new Date().getTime() - this.turnBeganAt)/1000));
+        this.timer.setText(secondsLeft.toString());
 
         if (this.game.input.activePointer.isDown) {
           if (this.localBoard.isMoveValid(move) && !this.pendingMove) {
@@ -197,6 +228,9 @@ module GobangOnline {
           }
           this.pendingMove = null;
         }
+      } else if (this.timer) {
+        this.timer.destroy();
+        this.timer = null;
       }
     }
 

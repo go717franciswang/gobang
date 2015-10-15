@@ -24,6 +24,10 @@ module GobangOnline {
       }
     }
 
+    getMoveCount() {
+      return this.moveLog.length;
+    }
+
     colorAt(move: Move): Color {
       return this.table[move.row][move.column];
     }
