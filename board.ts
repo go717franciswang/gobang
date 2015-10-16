@@ -24,6 +24,10 @@ module GobangOnline {
       }
     }
 
+    getMoveAt(id) {
+      return this.moveLog[id];
+    }
+
     getMoveCount() {
       return this.moveLog.length;
     }

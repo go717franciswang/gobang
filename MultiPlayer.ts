@@ -24,7 +24,6 @@ module GobangOnline {
 
     private takingTurn = false;
     private pendingMove:Move;
-    private blackTurn = true;
     private localBoard:Board;
     private timer:Phaser.Text;
     private turnBeganAt:number;
@@ -120,7 +119,7 @@ module GobangOnline {
         switch(data.type) {
           case MsgType.Move:
             var move:Move = data.move;
-            this.broadCast({ type: GobangOnline.MsgType.Move, move: move });
+            this.broadCast({ type: GobangOnline.MsgType.Move, move: move, moveId: this.engine.board.getMoveCount() });
             this.engine.pendingPlayer.makeMove(move);
           break;
           case MsgType.NewPlayer:
@@ -130,6 +129,11 @@ module GobangOnline {
               this.broadCast({ type: MsgType.PopupText, text: 'GAME IS READY' });
             } else {
               this.broadCast({ type: MsgType.PopupText, text: 'AN OBSERVER HAS ENTERED' });
+              setTimeout(() => {
+                for (var i = 0; i < this.engine.board.getMoveCount(); i++) {
+                  conn.send({ type: MsgType.Move, move: this.engine.board.getMoveAt(i), moveId: i });
+                }
+              }, 1000);
             }
           break;
         }
@@ -182,20 +186,19 @@ module GobangOnline {
             var move:Move = data.move;
             var pos = this.move2position(move);
             var piece = this.add.sprite(pos.x, pos.y, 'piece');
-            if (!this.blackTurn) {
+            var blackTurn = data.moveId%2 == 0;
+            if (!blackTurn) {
               piece.frame = 1;
             }
 
             piece.anchor.setTo(0.5, 0.5);
             piece.scale.setTo(0.12);
 
-            if (this.blackTurn) {
+            if (blackTurn) {
               this.localBoard.setColorAt(move, Color.Black);
             } else {
               this.localBoard.setColorAt(move, Color.White);
             }
-
-            this.blackTurn = !this.blackTurn;
           break;
           case MsgType.GameOver:
             var txt = data.winnerColor == Color.Black ? 'BLACK WINS' : 'WHITE WINS';

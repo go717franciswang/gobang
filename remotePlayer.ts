@@ -25,7 +25,7 @@ module GobangOnline {
     takeTurn(context:Gobang, lastMove:Move): void {
       this.context = context;
       this.conn.send({ type: MsgType.TakeTurn, lastMove: lastMove });
-      this.onTakeTurnCallback(this, this.context.board.getMoveCount());
+      this.onTakeTurnCallback(this.context.board.getMoveCount());
     }
 
     makeMove(move:Move) {

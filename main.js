@@ -140,6 +140,9 @@ var GobangOnline;
                 }
             }
         }
+        Board.prototype.getMoveAt = function (id) {
+            return this.moveLog[id];
+        };
         Board.prototype.getMoveCount = function () {
             return this.moveLog.length;
         };
@@ -791,7 +794,6 @@ var GobangOnline;
         function MultiPlayer() {
             _super.apply(this, arguments);
             this.takingTurn = false;
-            this.blackTurn = true;
         }
         MultiPlayer.prototype.create = function () {
             this.board = this.add.sprite(this.game.width / 2, this.game.height / 2, 'board');
@@ -871,7 +873,7 @@ var GobangOnline;
                 switch (data.type) {
                     case GobangOnline.MsgType.Move:
                         var move = data.move;
-                        _this.broadCast({ type: GobangOnline.MsgType.Move, move: move });
+                        _this.broadCast({ type: GobangOnline.MsgType.Move, move: move, moveId: _this.engine.board.getMoveCount() });
                         _this.engine.pendingPlayer.makeMove(move);
                         break;
                     case GobangOnline.MsgType.NewPlayer:
@@ -883,6 +885,11 @@ var GobangOnline;
                         }
                         else {
                             _this.broadCast({ type: GobangOnline.MsgType.PopupText, text: 'AN OBSERVER HAS ENTERED' });
+                            setTimeout(function () {
+                                for (var i = 0; i < _this.engine.board.getMoveCount(); i++) {
+                                    conn.send({ type: GobangOnline.MsgType.Move, move: _this.engine.board.getMoveAt(i), moveId: i });
+                                }
+                            }, 1000);
                         }
                         break;
                 }
@@ -926,18 +933,18 @@ var GobangOnline;
                         var move = data.move;
                         var pos = _this.move2position(move);
                         var piece = _this.add.sprite(pos.x, pos.y, 'piece');
-                        if (!_this.blackTurn) {
+                        var blackTurn = data.moveId % 2 == 0;
+                        if (!blackTurn) {
                             piece.frame = 1;
                         }
                         piece.anchor.setTo(0.5, 0.5);
                         piece.scale.setTo(0.12);
-                        if (_this.blackTurn) {
+                        if (blackTurn) {
                             _this.localBoard.setColorAt(move, GobangOnline.Color.Black);
                         }
                         else {
                             _this.localBoard.setColorAt(move, GobangOnline.Color.White);
                         }
-                        _this.blackTurn = !_this.blackTurn;
                         break;
                     case GobangOnline.MsgType.GameOver:
                         var txt = data.winnerColor == GobangOnline.Color.Black ? 'BLACK WINS' : 'WHITE WINS';

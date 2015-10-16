@@ -7,6 +7,7 @@ module GobangOnline {
   export interface Message {
     type:MsgType;
     move?:Move;
+    moveId?:number;
     winnerColor?:Color;
     text?:string;
   }
