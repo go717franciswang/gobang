@@ -14,9 +14,12 @@ module GobangOnline {
       this.load.image('menu', '/resources/gobang/menu.jpg');
       this.load.image('singlePlayerButton', '/resources/gobang/Play-button.gif');
       this.load.image('button', '/resources/gobang/blue-button-hi.png');
-      this.load.image('board', '/resources/gobang/board.jpg');
-      this.load.spritesheet('piece', '/resources/gobang/pieces.png', 289, 289, 2);
+      this.load.image('board', '/resources/gobang/board.png');
+      this.load.spritesheet('piece', '/resources/gobang/pieces.png', 100, 100, 2);
       this.load.bitmapFont('Castaway', '/resources/gobang/fonts/Castaway.png', '/resources/gobang/fonts/Castaway.xml');
+
+      // Remove antilias. This line does not work when it's in the create function
+      this.stage.smoothed = false;
     }
 
     create() {

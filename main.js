@@ -35,9 +35,10 @@ var GobangOnline;
             this.load.image('menu', '/resources/gobang/menu.jpg');
             this.load.image('singlePlayerButton', '/resources/gobang/Play-button.gif');
             this.load.image('button', '/resources/gobang/blue-button-hi.png');
-            this.load.image('board', '/resources/gobang/board.jpg');
-            this.load.spritesheet('piece', '/resources/gobang/pieces.png', 289, 289, 2);
+            this.load.image('board', '/resources/gobang/board.png');
+            this.load.spritesheet('piece', '/resources/gobang/pieces.png', 100, 100, 2);
             this.load.bitmapFont('Castaway', '/resources/gobang/fonts/Castaway.png', '/resources/gobang/fonts/Castaway.xml');
+            this.stage.smoothed = false;
         };
         Preloader.prototype.create = function () {
             var tween = this.add.tween(this.preloadBar).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);
@@ -635,6 +636,19 @@ var GobangOnline;
 })(GobangOnline || (GobangOnline = {}));
 var GobangOnline;
 (function (GobangOnline) {
+    GobangOnline.Settings = {
+        API_KEY: 'swe48rh5c9l1h5mi',
+        ROOMID: 'server',
+        BOARD_SIZE: 19,
+        MAX_WAIT_PER_MOVE: 10,
+        BOARD_X_START: 128 - 9,
+        BOARD_Y_START: 26 - 9,
+        BOARD_X_END: 689 - 9,
+        BOARD_Y_END: 590 - 9,
+    };
+})(GobangOnline || (GobangOnline = {}));
+var GobangOnline;
+(function (GobangOnline) {
     var SinglePlayer = (function (_super) {
         __extends(SinglePlayer, _super);
         function SinglePlayer() {
@@ -662,7 +676,7 @@ var GobangOnline;
                 msg.anchor.setTo(0.5, 0.5);
             };
             this.aiPlayer = new GobangOnline.AiPlayer(this.aiDepth, 100);
-            this.engine = new GobangOnline.Gobang(16, this.humanPlayer, this.aiPlayer);
+            this.engine = new GobangOnline.Gobang(GobangOnline.Settings.BOARD_SIZE, this.humanPlayer, this.aiPlayer);
             this.engine.setOnRegisterMove(function (player, move) {
                 var pos = _this.move2position(move);
                 var piece = _this.add.sprite(pos.x, pos.y, 'piece');
@@ -670,21 +684,21 @@ var GobangOnline;
                     piece.frame = 1;
                 }
                 piece.anchor.setTo(0.5, 0.5);
-                piece.scale.setTo(0.12);
+                piece.scale.setTo(30 / piece.width);
                 _this.stageGroup.add(piece);
             });
             this.engine.startGame();
         };
         SinglePlayer.prototype.move2position = function (move) {
             return {
-                x: move.column * 525 / 15 + 135,
-                y: move.row * 525 / 15 + 35
+                x: move.column * (GobangOnline.Settings.BOARD_X_END - GobangOnline.Settings.BOARD_X_START) / (GobangOnline.Settings.BOARD_SIZE - 1) + GobangOnline.Settings.BOARD_X_START,
+                y: move.row * (GobangOnline.Settings.BOARD_Y_END - GobangOnline.Settings.BOARD_Y_START) / (GobangOnline.Settings.BOARD_SIZE - 1) + GobangOnline.Settings.BOARD_Y_START
             };
         };
         SinglePlayer.prototype.position2move = function (position) {
             return {
-                row: Math.round((position.y - 35) / (525 / 15)),
-                column: Math.round((position.x - 135) / (525 / 15))
+                row: Math.round((position.y - GobangOnline.Settings.BOARD_Y_START) / ((GobangOnline.Settings.BOARD_Y_END - GobangOnline.Settings.BOARD_Y_START) / (GobangOnline.Settings.BOARD_SIZE - 1))),
+                column: Math.round((position.x - GobangOnline.Settings.BOARD_X_START) / ((GobangOnline.Settings.BOARD_X_END - GobangOnline.Settings.BOARD_X_START) / (GobangOnline.Settings.BOARD_SIZE - 1)))
             };
         };
         SinglePlayer.prototype.update = function () {
@@ -747,15 +761,6 @@ var GobangOnline;
     })(GobangOnline.MsgType || (GobangOnline.MsgType = {}));
     var MsgType = GobangOnline.MsgType;
     ;
-})(GobangOnline || (GobangOnline = {}));
-var GobangOnline;
-(function (GobangOnline) {
-    GobangOnline.Settings = {
-        API_KEY: 'swe48rh5c9l1h5mi',
-        ROOMID: 'server',
-        BOARD_SIZE: 16,
-        MAX_WAIT_PER_MOVE: 10
-    };
 })(GobangOnline || (GobangOnline = {}));
 var GobangOnline;
 (function (GobangOnline) {
@@ -938,7 +943,7 @@ var GobangOnline;
                             piece.frame = 1;
                         }
                         piece.anchor.setTo(0.5, 0.5);
-                        piece.scale.setTo(0.12);
+                        piece.scale.setTo(30 / piece.width);
                         if (blackTurn) {
                             _this.localBoard.setColorAt(move, GobangOnline.Color.Black);
                         }
@@ -982,16 +987,16 @@ var GobangOnline;
                 this.timer = null;
             }
         };
-        MultiPlayer.prototype.position2move = function (position) {
-            return {
-                row: Math.round((position.y - 35) / (525 / 15)),
-                column: Math.round((position.x - 135) / (525 / 15))
-            };
-        };
         MultiPlayer.prototype.move2position = function (move) {
             return {
-                x: move.column * 525 / 15 + 135,
-                y: move.row * 525 / 15 + 35
+                x: move.column * (GobangOnline.Settings.BOARD_X_END - GobangOnline.Settings.BOARD_X_START) / (GobangOnline.Settings.BOARD_SIZE - 1) + GobangOnline.Settings.BOARD_X_START,
+                y: move.row * (GobangOnline.Settings.BOARD_Y_END - GobangOnline.Settings.BOARD_Y_START) / (GobangOnline.Settings.BOARD_SIZE - 1) + GobangOnline.Settings.BOARD_Y_START
+            };
+        };
+        MultiPlayer.prototype.position2move = function (position) {
+            return {
+                row: Math.round((position.y - GobangOnline.Settings.BOARD_Y_START) / ((GobangOnline.Settings.BOARD_Y_END - GobangOnline.Settings.BOARD_Y_START) / (GobangOnline.Settings.BOARD_SIZE - 1))),
+                column: Math.round((position.x - GobangOnline.Settings.BOARD_X_START) / ((GobangOnline.Settings.BOARD_X_END - GobangOnline.Settings.BOARD_X_START) / (GobangOnline.Settings.BOARD_SIZE - 1)))
             };
         };
         return MultiPlayer;

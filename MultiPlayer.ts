@@ -192,7 +192,7 @@ module GobangOnline {
             }
 
             piece.anchor.setTo(0.5, 0.5);
-            piece.scale.setTo(0.12);
+            piece.scale.setTo(30/piece.width);
 
             if (blackTurn) {
               this.localBoard.setColorAt(move, Color.Black);
@@ -237,17 +237,17 @@ module GobangOnline {
       }
     }
 
-    position2move(position: { x: number; y: number }): Move {
+    move2position(move: Move): { x: number; y: number } {
       return {
-        row: Math.round((position.y-35)/(525/15)),
-        column: Math.round((position.x-135)/(525/15))
+        x: move.column*(Settings.BOARD_X_END - Settings.BOARD_X_START)/(Settings.BOARD_SIZE-1)+Settings.BOARD_X_START,
+        y: move.row*(Settings.BOARD_Y_END - Settings.BOARD_Y_START)/(Settings.BOARD_SIZE-1)+Settings.BOARD_Y_START
       };
     }
 
-    move2position(move: Move): { x: number; y: number } {
+    position2move(position: { x: number; y: number }): Move {
       return {
-        x: move.column*525/15+135,
-        y: move.row*525/15+35
+        row: Math.round((position.y-Settings.BOARD_Y_START)/((Settings.BOARD_Y_END - Settings.BOARD_Y_START)/(Settings.BOARD_SIZE-1))),
+        column: Math.round((position.x-Settings.BOARD_X_START)/((Settings.BOARD_X_END - Settings.BOARD_X_START)/(Settings.BOARD_SIZE-1)))
       };
     }
   }
