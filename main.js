@@ -359,16 +359,16 @@ var GobangOnline;
                 "011110"
             ],
             score: 5000,
-            rivalScore: 3000
+            rivalScore: 2100
         },
         {
             name: "冲四",
             patterns: [
                 "011112",
-                "0101110",
-                "0110110"
+                "010111",
+                "011011"
             ],
-            score: 2100,
+            score: 2101,
             rivalScore: 1800
         },
         {
@@ -519,14 +519,18 @@ var GobangOnline;
     function computeHeuristicOfBoard(playerColor, board) {
         var heuristics = 0;
         var heuristicsRival = 0;
+        var h = [];
+        var hr = [];
         for (var i = 0; i < board.size; i++) {
             for (var j = 0; j < board.size; j++) {
                 var m = { row: i, column: j };
-                heuristics = Math.max(heuristics, computeHeuristicAt(playerColor, m, board, false));
-                heuristicsRival = Math.max(heuristicsRival, computeHeuristicAt(playerColor, m, board, true));
+                h.push(computeHeuristicAt(playerColor, m, board, false));
+                hr.push(computeHeuristicAt(playerColor, m, board, true));
             }
         }
-        return heuristics - heuristicsRival;
+        h.sort().reverse();
+        hr.sort().reverse();
+        return h[0] + h[1] - hr[0] - hr[1];
     }
     GobangOnline.computeHeuristicOfBoard = computeHeuristicOfBoard;
 })(GobangOnline || (GobangOnline = {}));
@@ -544,6 +548,7 @@ var GobangOnline;
         AiPlayer.prototype.takeTurn = function (context, lastMove) {
             var v = this.alphabeta(context.board, this.depth, -Infinity, Infinity, true);
             console.log(v, this.maximizingMove);
+            console.log('end turn');
             context.registerMove(this, this.maximizingMove);
         };
         AiPlayer.prototype.alphabeta = function (node, depth, alpha, beta, maximizingPlayer) {
@@ -558,6 +563,9 @@ var GobangOnline;
                     var m = moves[i];
                     node.setColorAt(m, this.color);
                     var tmp = this.alphabeta(node, depth - 1, alpha, beta, !maximizingPlayer);
+                    if (depth == this.depth) {
+                        console.log(tmp, m);
+                    }
                     if (depth == this.depth && tmp > v) {
                         this.maximizingMove = m;
                     }
@@ -589,6 +597,8 @@ var GobangOnline;
         };
         AiPlayer.prototype.getTopCandidates = function (board, maxCandidates, maximizingPlayer) {
             var candidates = this.getCandidates(board);
+            if (candidates.length <= maxCandidates)
+                return candidates;
             var candidateHeuristics = [];
             for (var i = 0; i < candidates.length; i++) {
                 var move = candidates[i];

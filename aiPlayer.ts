@@ -20,6 +20,7 @@ module GobangOnline {
 
       var v = this.alphabeta(context.board, this.depth, -Infinity, Infinity, true);
       console.log(v, this.maximizingMove);
+      console.log('end turn');
       context.registerMove(this, this.maximizingMove);
     }
 
@@ -37,6 +38,9 @@ module GobangOnline {
           var m = moves[i];
           node.setColorAt(m, this.color);
           var tmp = this.alphabeta(node, depth-1, alpha, beta, !maximizingPlayer);
+          if (depth == this.depth) {
+            console.log(tmp, m);
+          }
           if (depth == this.depth && tmp > v) {
             this.maximizingMove = m;
           }
@@ -74,6 +78,7 @@ module GobangOnline {
 
     getTopCandidates(board: Board, maxCandidates: number, maximizingPlayer:boolean): Move[] {
       var candidates = this.getCandidates(board);
+      if (candidates.length <= maxCandidates) return candidates;
       var candidateHeuristics = [];
 
       for (var i = 0; i < candidates.length; i++) {

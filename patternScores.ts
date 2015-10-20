@@ -17,16 +17,16 @@ module GobangOnline {
         "011110"
       ],
       score: 5000,
-      rivalScore: 3000
+      rivalScore: 2100
     },
     {
       name: "冲四",
       patterns: [
         "011112",
-        "0101110",
-        "0110110"
+        "010111",
+        "011011"
       ],
-      score: 2100,
+      score: 2101,
       rivalScore: 1800
     },
     {

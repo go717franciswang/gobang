@@ -56,14 +56,24 @@ module GobangOnline {
     var heuristics = 0;
     var heuristicsRival = 0;
 
+    var h = [];
+    var hr = [];
+
     for (var i = 0; i < board.size; i++) {
       for (var j = 0; j < board.size; j++) {
         var m = { row: i, column: j };
-        heuristics = Math.max(heuristics, computeHeuristicAt(playerColor, m, board, false));
-        heuristicsRival = Math.max(heuristicsRival, computeHeuristicAt(playerColor, m, board, true));
+        //heuristics = Math.max(heuristics, computeHeuristicAt(playerColor, m, board, false));
+        //heuristicsRival = Math.max(heuristicsRival, computeHeuristicAt(playerColor, m, board, true));
+        //heuristics += computeHeuristicAt(playerColor, m, board, false);
+        //heuristicsRival += computeHeuristicAt(playerColor, m, board, true);
+        h.push(computeHeuristicAt(playerColor, m, board, false));
+        hr.push(computeHeuristicAt(playerColor, m, board, true));
       }
     }
 
-    return heuristics - heuristicsRival;
+    h.sort().reverse();
+    hr.sort().reverse();
+    return h[0]+h[1]-hr[0]-hr[1];
+    //return heuristics - heuristicsRival;
   }
 }
