@@ -30,14 +30,14 @@ module GobangOnline {
       }
 
       if (maximizingPlayer) {
-        var v = -Infinity;
+        var v = alpha;
         var maximizingMove:Move;
 
         var moves = this.getTopCandidates(node, this.maxCandidates, true);
         for (var i = 0; i < moves.length; i++) {
           var m = moves[i];
           node.setColorAt(m, this.color);
-          var tmp = this.alphabeta(node, depth-1, alpha, beta, !maximizingPlayer);
+          var tmp = this.alphabeta(node, depth-1, v, beta, !maximizingPlayer);
           if (depth == this.depth) {
             console.log(tmp, m);
           }
@@ -47,28 +47,25 @@ module GobangOnline {
           //console.log(depth, i, m, tmp)
           v = Math.max(v, tmp);
           node.revertLastMove();
-          alpha = Math.max(alpha, v);
-
-          if (beta <= alpha) {
-            break;
+          if (beta <= v) {
+            return v;
           }
         }
 
         return v;
       } else {
-        var v = Infinity;
+        var v = beta;
 
         var moves = this.getTopCandidates(node, this.maxCandidates, false);
         for (var i = 0; i < moves.length; i++) {
           var m = moves[i];
           node.setColorAt(m, getOpponentColor(this.color));
-          var tmp = this.alphabeta(node, depth-1, alpha, beta, !maximizingPlayer);
+          var tmp = this.alphabeta(node, depth-1, alpha, v, !maximizingPlayer);
           //console.log(depth, i, m, tmp)
           v = Math.min(v, tmp);
           node.revertLastMove();
-          beta = Math.min(beta, v);
-          if (beta <= alpha) {
-            break;
+          if (v <= alpha) {
+            return v;
           }
         }
 
