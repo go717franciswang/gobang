@@ -396,7 +396,7 @@ var GobangOnline;
         {
             name: "活二",
             patterns: [
-                "00110",
+                "001100",
                 "01010",
                 "010010"
             ],
@@ -417,6 +417,90 @@ var GobangOnline;
             rivalScore: 80
         },
     ];
+    var alternativeScore = [
+        {
+            "patternNames": { "连五": 1 },
+            "score": 100000
+        },
+        {
+            "patternNames": { "活四": 1 },
+            "score": 10000
+        },
+        {
+            "patternNames": { "冲四": 2 },
+            "score": 10000
+        },
+        {
+            "patternNames": { "冲四": 1, "活三": 1 },
+            "score": 10000
+        },
+        {
+            "patternNames": { "活三": 2 },
+            "score": 5000
+        },
+        {
+            "patternNames": { "活三": 1, "眠三": 1 },
+            "score": 1000
+        },
+        {
+            "patternNames": { "冲四": 1 },
+            "score": 8000
+        },
+        {
+            "patternNames": { "活三": 1 },
+            "score": 200
+        },
+        {
+            "patternNames": { "活二": 2 },
+            "score": 100
+        },
+        {
+            "patternNames": { "眠三": 1 },
+            "score": 50
+        },
+        {
+            "patternNames": { "活二": 1, "眠二": 1 },
+            "score": 10
+        },
+        {
+            "patternNames": { "活二": 1 },
+            "score": 5
+        },
+        {
+            "patternNames": { "眠二": 1 },
+            "score": 3
+        },
+    ];
+    console.log(alternativeScore);
+    function countPatternNames(patterNames) {
+        var count = {};
+        for (var i = 0; i < patterNames.length; i++) {
+            var name = patterNames[i];
+            if (count[name] == undefined) {
+                count[name] = 0;
+            }
+            count[name] += 1;
+        }
+        return count;
+    }
+    function isPatternSubset(subsetPatterns, parentPatterns) {
+        for (var name in subsetPatterns) {
+            if (parentPatterns[name] == undefined || parentPatterns[name] < subsetPatterns[name]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    function alternativePatternsToScore(patternNames) {
+        var count = countPatternNames(patternNames);
+        for (var i = 0; i < alternativeScore.length; i++) {
+            if (isPatternSubset(alternativeScore[i].patternNames, count)) {
+                return alternativeScore[i].score;
+            }
+        }
+        return 0;
+    }
+    GobangOnline.alternativePatternsToScore = alternativePatternsToScore;
 })(GobangOnline || (GobangOnline = {}));
 var GobangOnline;
 (function (GobangOnline) {
@@ -434,6 +518,7 @@ var GobangOnline;
             this.children = {};
             this.score = 0;
             this.rivalScore = 0;
+            this.name = null;
         }
         return Node;
     })();
@@ -454,6 +539,7 @@ var GobangOnline;
                 if (k == pattern.length - 1) {
                     node.score = patternData.score;
                     node.rivalScore = patternData.rivalScore;
+                    node.name = patternData.name;
                 }
             }
             node = GobangOnline.root;
@@ -466,6 +552,7 @@ var GobangOnline;
                 if (k == 0) {
                     node.score = patternData.score;
                     node.rivalScore = patternData.rivalScore;
+                    node.name = patternData.name;
                 }
             }
         }
@@ -516,7 +603,7 @@ var GobangOnline;
         return heuristics;
     }
     GobangOnline.computeHeuristicAt = computeHeuristicAt;
-    function computeHeuristicOfBoard(playerColor, board) {
+    function computeHeuristicOfBoardOld(playerColor, board) {
         var heuristics = 0;
         var heuristicsRival = 0;
         var h = [];
@@ -529,6 +616,52 @@ var GobangOnline;
             }
         }
         return heuristics - heuristicsRival;
+    }
+    GobangOnline.computeHeuristicOfBoardOld = computeHeuristicOfBoardOld;
+    function matchPatternsAt(playerColor, move, board) {
+        var patternNames = [];
+        var directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
+        for (var i = 0; i < directions.length; i++) {
+            var node = GobangOnline.root;
+            var dx = directions[i][0];
+            var dy = directions[i][1];
+            var edgetPatternName = null;
+            var j = 0;
+            while (true) {
+                var m = { row: move.row + dy * j, column: move.column + dx * j };
+                if (board.isOutOfBound(m)) {
+                    break;
+                }
+                var ownership = color2ownership(board.colorAt(m), playerColor);
+                if (node.children[ownership]) {
+                    node = node.children[ownership];
+                    if (node.name) {
+                        edgetPatternName = node.name;
+                    }
+                }
+                else {
+                    break;
+                }
+                if (edgetPatternName) {
+                    patternNames.push(node.name);
+                }
+                j++;
+            }
+        }
+        return patternNames;
+    }
+    GobangOnline.matchPatternsAt = matchPatternsAt;
+    function computeHeuristicOfBoard(playerColor, board) {
+        var playerPatterns = [];
+        var opponentPatterns = [];
+        for (var i = 0; i < board.size; i++) {
+            for (var j = 0; j < board.size; j++) {
+                var m = { row: i, column: j };
+                playerPatterns = playerPatterns.concat(this.matchPatternsAt(playerColor, m, board));
+                opponentPatterns = opponentPatterns.concat(this.matchPatternsAt(GobangOnline.getOpponentColor(playerColor), m, board));
+            }
+        }
+        return GobangOnline.alternativePatternsToScore(playerPatterns) - GobangOnline.alternativePatternsToScore(opponentPatterns) * 1.5;
     }
     GobangOnline.computeHeuristicOfBoard = computeHeuristicOfBoard;
 })(GobangOnline || (GobangOnline = {}));

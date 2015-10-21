@@ -7,11 +7,13 @@ module GobangOnline {
     public children: { [ownership: number]: Node; };
     public score: number;
     public rivalScore: number;
+    public name: string;
 
     constructor(public ownership: PieceOwnership) {
       this.children = {};
       this.score = 0;
       this.rivalScore = 0;
+      this.name = null;
     }
   }
 
@@ -36,6 +38,7 @@ module GobangOnline {
         if (k == pattern.length-1) {
           node.score = patternData.score;
           node.rivalScore = patternData.rivalScore;
+          node.name = patternData.name;
         }
       }
 
@@ -50,6 +53,7 @@ module GobangOnline {
         if (k == 0) {
           node.score = patternData.score;
           node.rivalScore = patternData.rivalScore;
+          node.name = patternData.name;
         }
       }
     }

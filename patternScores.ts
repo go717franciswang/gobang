@@ -55,7 +55,7 @@ module GobangOnline {
     {
       name: "活二",
       patterns: [
-        "00110",
+        "001100",
         "01010",
         "010010"
       ],
@@ -78,58 +78,97 @@ module GobangOnline {
   ];
 
   // http://zjh776.iteye.com/blog/1979748
-  export var alternativeScore = [
+  var alternativeScore = [
     {
-      "patternNames": ["长连"],
+      "patternNames": { "连五": 1 },
       "score": 100000
     },
     {
-      "patternNames": ["活四"],
+      "patternNames": { "活四": 1 },
       "score": 10000
     },
     {
-      "patternNames": ["冲四", "冲四"],
+      "patternNames": { "冲四": 2 },
       "score": 10000
     },
     {
-      "patternNames": ["冲四", "活三"],
+      "patternNames": { "冲四": 1, "活三": 1 },
       "score": 10000
     },
     {
-      "patternNames": ["活三", "活三"],
+      "patternNames": { "活三": 2 },
       "score": 5000
     },
     {
-      "patternNames": ["活三", "眠三"],
+      "patternNames": { "活三": 1, "眠三": 1 },
       "score": 1000
     },
     {
-      "patternNames": ["冲四"],
-      "score": 500
+      "patternNames": { "冲四": 1 },
+      "score": 8000
     },
     {
-      "patternNames": ["活三"],
+      "patternNames": { "活三": 1 },
       "score": 200
     },
     {
-      "patternNames": ["活二", "活二"],
+      "patternNames": { "活二": 2 },
       "score": 100
     },
     {
-      "patternNames": ["眠三"],
+      "patternNames": { "眠三": 1 },
       "score": 50
     },
     {
-      "patternNames": ["活二", "眠二"],
+      "patternNames": { "活二": 1, "眠二": 1 },
       "score": 10
     },
     {
-      "patternNames": ["活二"],
+      "patternNames": { "活二": 1 },
       "score": 5
     },
     {
-      "patternNames": ["眠二"],
+      "patternNames": { "眠二": 1 },
       "score": 3
     },
   ];
+
+  console.log(alternativeScore);
+
+  function countPatternNames(patterNames:string[]) {
+    var count = {};
+    for (var i = 0; i < patterNames.length; i++) {
+      var name = patterNames[i];
+      if (count[name] == undefined) {
+        count[name] = 0;
+      }
+
+      count[name] += 1;
+    }
+
+    return count;
+  }
+
+  function isPatternSubset(subsetPatterns, parentPatterns) {
+    for (var name in subsetPatterns) {
+      if (parentPatterns[name] == undefined || parentPatterns[name] < subsetPatterns[name]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  export function alternativePatternsToScore(patternNames:string[]) {
+
+    var count = countPatternNames(patternNames);
+
+    for (var i = 0; i < alternativeScore.length; i++) {
+      if (isPatternSubset(alternativeScore[i].patternNames, count)) {
+        return alternativeScore[i].score;
+      }
+    }
+
+    return 0;
+  }
 }
