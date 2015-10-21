@@ -346,7 +346,7 @@ var GobangOnline;
 (function (GobangOnline) {
     GobangOnline.patternScore = [
         {
-            name: "长连",
+            name: "连五",
             patterns: [
                 "11111"
             ],
@@ -365,8 +365,8 @@ var GobangOnline;
             name: "冲四",
             patterns: [
                 "011112",
-                "010111",
-                "011011"
+                "10111",
+                "11011"
             ],
             score: 2101,
             rivalScore: 1800
@@ -386,8 +386,8 @@ var GobangOnline;
                 "001112",
                 "010112",
                 "011012",
-                "10011",
-                "10101",
+                "0100110",
+                "0101010",
                 "2011102"
             ],
             score: 600,
@@ -409,7 +409,7 @@ var GobangOnline;
                 "000112",
                 "001012",
                 "010012",
-                "10001",
+                "0100010",
                 "2010102",
                 "2011002"
             ],
@@ -524,13 +524,11 @@ var GobangOnline;
         for (var i = 0; i < board.size; i++) {
             for (var j = 0; j < board.size; j++) {
                 var m = { row: i, column: j };
-                h.push(computeHeuristicAt(playerColor, m, board, false));
-                hr.push(computeHeuristicAt(playerColor, m, board, true));
+                heuristics += computeHeuristicAt(playerColor, m, board, false);
+                heuristicsRival += computeHeuristicAt(playerColor, m, board, true);
             }
         }
-        h.sort().reverse();
-        hr.sort().reverse();
-        return h[0] + h[1] - hr[0] - hr[1];
+        return heuristics - heuristicsRival;
     }
     GobangOnline.computeHeuristicOfBoard = computeHeuristicOfBoard;
 })(GobangOnline || (GobangOnline = {}));
@@ -546,10 +544,43 @@ var GobangOnline;
             this.color = color;
         };
         AiPlayer.prototype.takeTurn = function (context, lastMove) {
-            var v = this.alphabeta(context.board, this.depth, -Infinity, Infinity, true);
+            var v = this.minimax(context.board, this.depth, true);
             console.log(v, this.maximizingMove);
             console.log('end turn');
             context.registerMove(this, this.maximizingMove);
+        };
+        AiPlayer.prototype.minimax = function (node, depth, maximizingPlayer) {
+            if (depth == 0)
+                return GobangOnline.computeHeuristicOfBoard(this.color, node);
+            if (maximizingPlayer) {
+                var moves = this.getTopCandidates(node, this.maxCandidates, true);
+                var v = -Infinity;
+                for (var i = 0; i < moves.length; i++) {
+                    var m = moves[i];
+                    node.setColorAt(m, this.color);
+                    var v1 = this.minimax(node, depth - 1, !maximizingPlayer);
+                    if (depth == this.depth) {
+                        console.log(v1, m);
+                    }
+                    if (depth == this.depth && v1 > v) {
+                        this.maximizingMove = m;
+                    }
+                    v = Math.max(v, v1);
+                    node.revertLastMove();
+                }
+                return v;
+            }
+            else {
+                var moves = this.getTopCandidates(node, this.maxCandidates, false);
+                var v = Infinity;
+                for (var i = 0; i < moves.length; i++) {
+                    var m = moves[i];
+                    node.setColorAt(m, this.color);
+                    v = Math.min(v, this.minimax(node, depth - 1, !maximizingPlayer));
+                    node.revertLastMove();
+                }
+                return v;
+            }
         };
         AiPlayer.prototype.alphabeta = function (node, depth, alpha, beta, maximizingPlayer) {
             if (depth == 0) {

@@ -18,10 +18,49 @@ module GobangOnline {
     takeTurn(context: Gobang, lastMove: Move): void {
       // console.log('heuristics: ' + computeHeuristicOfBoard(this, context.board));
 
-      var v = this.alphabeta(context.board, this.depth, -Infinity, Infinity, true);
+      //var v = this.alphabeta(context.board, this.depth, -Infinity, Infinity, true);
+      var v = this.minimax(context.board, this.depth, true);
       console.log(v, this.maximizingMove);
       console.log('end turn');
       context.registerMove(this, this.maximizingMove);
+    }
+
+    minimax(node:Board, depth:number, maximizingPlayer:boolean):number {
+      if (depth == 0) return computeHeuristicOfBoard(this.color, node);
+
+      if (maximizingPlayer) {
+        var moves = this.getTopCandidates(node, this.maxCandidates, true);
+        var v = -Infinity;
+        for (var i = 0; i < moves.length; i++) {
+          var m = moves[i];
+          node.setColorAt(m, this.color);
+          var v1 = this.minimax(node, depth-1, !maximizingPlayer);
+
+          if (depth == this.depth) {
+            console.log(v1, m);
+          }
+
+          if (depth == this.depth && v1 > v) {
+            this.maximizingMove = m;
+          }
+
+          v = Math.max(v, v1);
+          node.revertLastMove();
+        }
+
+        return v;
+      } else {
+        var moves = this.getTopCandidates(node, this.maxCandidates, false);
+        var v = Infinity;
+        for (var i = 0; i < moves.length; i++) {
+          var m = moves[i];
+          node.setColorAt(m, this.color);
+          v = Math.min(v, this.minimax(node, depth-1, !maximizingPlayer));
+          node.revertLastMove();
+        }
+
+        return v;
+      }
     }
 
     alphabeta(node:Board, depth:number, alpha:number, beta:number, maximizingPlayer:boolean):number {
