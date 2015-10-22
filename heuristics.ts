@@ -129,6 +129,6 @@ module GobangOnline {
       }
     }
 
-    return alternativePatternsToScore(playerPatterns) - alternativePatternsToScore(opponentPatterns)*1.5;
+    return alternativePatternsToScore(playerPatterns) - alternativePatternsToScore(opponentPatterns)*1.201;
   }
 }

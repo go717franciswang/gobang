@@ -147,6 +147,9 @@ var GobangOnline;
         Board.prototype.getMoveCount = function () {
             return this.moveLog.length;
         };
+        Board.prototype.getLastMove = function () {
+            return this.moveLog[this.getMoveCount() - 1];
+        };
         Board.prototype.colorAt = function (move) {
             return this.table[move.row][move.column];
         };
@@ -174,6 +177,74 @@ var GobangOnline;
                     if (!(dx == 0 && dy == 0) && !this.isOutOfBound(neighbor) && this.colorAt(neighbor) != Color.Empty) {
                         return true;
                     }
+                }
+            }
+            return false;
+        };
+        Board.prototype.isGameOver = function (playerColor) {
+            var run;
+            for (var i = 0; i < this.size; i++) {
+                run = 0;
+                for (var j = 0; j < this.size; j++) {
+                    if (this.colorAt({ row: i, column: j }) == playerColor) {
+                        run++;
+                    }
+                    else {
+                        run = 0;
+                    }
+                    if (run == 5) {
+                        return true;
+                    }
+                }
+            }
+            for (var i = 0; i < this.size; i++) {
+                run = 0;
+                for (var j = 0; j < this.size; j++) {
+                    if (this.colorAt({ row: j, column: i }) == playerColor) {
+                        run++;
+                    }
+                    else {
+                        run = 0;
+                    }
+                    if (run == 5) {
+                        return true;
+                    }
+                }
+            }
+            for (var i = 0; i < (this.size - 4) * 2 - 1; i++) {
+                run = 0;
+                var r = Math.max(this.size - 5 - i, 0);
+                var c = Math.max(i - (this.size - 5), 0);
+                while (r < this.size && c < this.size) {
+                    if (this.colorAt({ row: r, column: c }) == playerColor) {
+                        run++;
+                    }
+                    else {
+                        run = 0;
+                    }
+                    if (run == 5) {
+                        return true;
+                    }
+                    r++;
+                    c++;
+                }
+            }
+            for (var i = 0; i < (this.size - 4) * 2 - 1; i++) {
+                run = 0;
+                var r = Math.min(i + 4, this.size - 1);
+                var c = Math.max(i - (this.size - 5), 0);
+                while (r >= 0 && c < this.size) {
+                    if (this.colorAt({ row: r, column: c }) == playerColor) {
+                        run++;
+                    }
+                    else {
+                        run = 0;
+                    }
+                    if (run == 5) {
+                        return true;
+                    }
+                    r--;
+                    c++;
                 }
             }
             return false;
@@ -242,72 +313,7 @@ var GobangOnline;
             this.nonPendingPlayer = tmp;
         };
         Gobang.prototype.isGameOver = function (checkPlayer) {
-            var run;
-            for (var i = 0; i < this.size; i++) {
-                run = 0;
-                for (var j = 0; j < this.size; j++) {
-                    if (this.board.colorAt({ row: i, column: j }) == checkPlayer.color) {
-                        run++;
-                    }
-                    else {
-                        run = 0;
-                    }
-                    if (run == 5) {
-                        return true;
-                    }
-                }
-            }
-            for (var i = 0; i < this.size; i++) {
-                run = 0;
-                for (var j = 0; j < this.size; j++) {
-                    if (this.board.colorAt({ row: j, column: i }) == checkPlayer.color) {
-                        run++;
-                    }
-                    else {
-                        run = 0;
-                    }
-                    if (run == 5) {
-                        return true;
-                    }
-                }
-            }
-            for (var i = 0; i < (this.size - 4) * 2 - 1; i++) {
-                run = 0;
-                var r = Math.max(this.size - 5 - i, 0);
-                var c = Math.max(i - (this.size - 5), 0);
-                while (r < this.size && c < this.size) {
-                    if (this.board.colorAt({ row: r, column: c }) == checkPlayer.color) {
-                        run++;
-                    }
-                    else {
-                        run = 0;
-                    }
-                    if (run == 5) {
-                        return true;
-                    }
-                    r++;
-                    c++;
-                }
-            }
-            for (var i = 0; i < (this.size - 4) * 2 - 1; i++) {
-                run = 0;
-                var r = Math.min(i + 4, this.size - 1);
-                var c = Math.max(i - (this.size - 5), 0);
-                while (r >= 0 && c < this.size) {
-                    if (this.board.colorAt({ row: r, column: c }) == checkPlayer.color) {
-                        run++;
-                    }
-                    else {
-                        run = 0;
-                    }
-                    if (run == 5) {
-                        return true;
-                    }
-                    r--;
-                    c++;
-                }
-            }
-            return false;
+            return this.board.isGameOver(checkPlayer.color);
         };
         return Gobang;
     })();
@@ -435,16 +441,16 @@ var GobangOnline;
             "score": 10000
         },
         {
+            "patternNames": { "冲四": 1 },
+            "score": 8000
+        },
+        {
             "patternNames": { "活三": 2 },
             "score": 5000
         },
         {
             "patternNames": { "活三": 1, "眠三": 1 },
             "score": 1000
-        },
-        {
-            "patternNames": { "冲四": 1 },
-            "score": 8000
         },
         {
             "patternNames": { "活三": 1 },
@@ -661,7 +667,7 @@ var GobangOnline;
                 opponentPatterns = opponentPatterns.concat(this.matchPatternsAt(GobangOnline.getOpponentColor(playerColor), m, board));
             }
         }
-        return GobangOnline.alternativePatternsToScore(playerPatterns) - GobangOnline.alternativePatternsToScore(opponentPatterns) * 1.5;
+        return GobangOnline.alternativePatternsToScore(playerPatterns) - GobangOnline.alternativePatternsToScore(opponentPatterns) * 1.201;
     }
     GobangOnline.computeHeuristicOfBoard = computeHeuristicOfBoard;
 })(GobangOnline || (GobangOnline = {}));
@@ -685,6 +691,10 @@ var GobangOnline;
         AiPlayer.prototype.minimax = function (node, depth, maximizingPlayer) {
             if (depth == 0)
                 return GobangOnline.computeHeuristicOfBoard(this.color, node);
+            if (node.isGameOver(this.color))
+                return Infinity;
+            if (node.isGameOver(GobangOnline.getOpponentColor(this.color)))
+                return -Infinity;
             if (maximizingPlayer) {
                 var moves = this.getTopCandidates(node, this.maxCandidates, true);
                 var v = -Infinity;

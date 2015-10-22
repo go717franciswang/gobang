@@ -96,16 +96,16 @@ module GobangOnline {
       "score": 10000
     },
     {
+      "patternNames": { "冲四": 1 },
+      "score": 8000
+    },
+    {
       "patternNames": { "活三": 2 },
       "score": 5000
     },
     {
       "patternNames": { "活三": 1, "眠三": 1 },
       "score": 1000
-    },
-    {
-      "patternNames": { "冲四": 1 },
-      "score": 8000
     },
     {
       "patternNames": { "活三": 1 },

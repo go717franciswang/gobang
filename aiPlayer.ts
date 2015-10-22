@@ -27,6 +27,8 @@ module GobangOnline {
 
     minimax(node:Board, depth:number, maximizingPlayer:boolean):number {
       if (depth == 0) return computeHeuristicOfBoard(this.color, node);
+      if (node.isGameOver(this.color)) return Infinity;
+      if (node.isGameOver(getOpponentColor(this.color))) return -Infinity;
 
       if (maximizingPlayer) {
         var moves = this.getTopCandidates(node, this.maxCandidates, true);
