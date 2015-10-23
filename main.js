@@ -689,12 +689,12 @@ var GobangOnline;
             context.registerMove(this, this.maximizingMove);
         };
         AiPlayer.prototype.minimax = function (node, depth, maximizingPlayer) {
-            if (depth == 0)
-                return GobangOnline.computeHeuristicOfBoard(this.color, node);
-            if (node.isGameOver(this.color))
-                return Infinity;
             if (node.isGameOver(GobangOnline.getOpponentColor(this.color)))
                 return -Infinity;
+            if (node.isGameOver(this.color))
+                return Infinity;
+            if (depth == 0)
+                return GobangOnline.computeHeuristicOfBoard(this.color, node);
             if (maximizingPlayer) {
                 var moves = this.getTopCandidates(node, this.maxCandidates, true);
                 var v = -Infinity;
@@ -718,7 +718,7 @@ var GobangOnline;
                 var v = Infinity;
                 for (var i = 0; i < moves.length; i++) {
                     var m = moves[i];
-                    node.setColorAt(m, this.color);
+                    node.setColorAt(m, GobangOnline.getOpponentColor(this.color));
                     v = Math.min(v, this.minimax(node, depth - 1, !maximizingPlayer));
                     node.revertLastMove();
                 }
