@@ -77,7 +77,7 @@ module GobangOnline {
     return heuristics - heuristicsRival;
   }
 
-  export function matchPatternsAt(playerColor:Color, move:Move, board:Board) {
+  export function matchPatternsAt(playerColor:Color, move:Move, board:Board, searched:boolean[][]) {
     var patternNames = [];
     var directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
 
@@ -99,6 +99,9 @@ module GobangOnline {
           node = node.children[ownership];
           if (node.name) {
             edgetPatternName = node.name;
+            for (var k = 0; k <= j; k++) {
+              searched[move.row+dy*k][move.column+dx*k] = true;
+            }
           }
         } else {
           break;
@@ -120,12 +123,22 @@ module GobangOnline {
   export function computeHeuristicOfBoard(playerColor: Color, board: Board): number {
     var playerPatterns = [];
     var opponentPatterns = [];
+    var searched = buildSquareMatrix(board.size, false);
+    var searchedOpponent = buildSquareMatrix(board.size, false);
 
     for (var i = 0; i < board.size; i++) {
       for (var j = 0; j < board.size; j++) {
         var m = { row: i, column: j };
-        playerPatterns = playerPatterns.concat(this.matchPatternsAt(playerColor, m, board));
-        opponentPatterns = opponentPatterns.concat(this.matchPatternsAt(getOpponentColor(playerColor), m, board));
+
+        // do not search searched area to avoid the following situation
+        // 11101 misinterpreted as both 冲四 and 活三
+        if (!searched[i][j]) {
+          playerPatterns = playerPatterns.concat(this.matchPatternsAt(playerColor, m, board, searched));
+        }
+
+        if (!searchedOpponent[i][j]) {
+          opponentPatterns = opponentPatterns.concat(this.matchPatternsAt(getOpponentColor(playerColor), m, board, searchedOpponent));
+        }
       }
     }
 

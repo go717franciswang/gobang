@@ -129,17 +129,22 @@ var GobangOnline;
         return color == Color.Black ? Color.White : Color.Black;
     }
     GobangOnline.getOpponentColor = getOpponentColor;
+    function buildSquareMatrix(size, defaultValue) {
+        var matrix = [];
+        for (var i = 0; i < size; i++) {
+            matrix[i] = [];
+            for (var j = 0; j < size; j++) {
+                matrix[i][j] = defaultValue;
+            }
+        }
+        return matrix;
+    }
+    GobangOnline.buildSquareMatrix = buildSquareMatrix;
     var Board = (function () {
         function Board(size) {
             this.size = size;
-            this.table = [];
+            this.table = buildSquareMatrix(size, Color.Empty);
             this.moveLog = [];
-            for (var i = 0; i < size; i++) {
-                this.table[i] = [];
-                for (var j = 0; j < size; j++) {
-                    this.table[i][j] = Color.Empty;
-                }
-            }
         }
         Board.prototype.getMoveAt = function (id) {
             return this.moveLog[id];
@@ -624,7 +629,7 @@ var GobangOnline;
         return heuristics - heuristicsRival;
     }
     GobangOnline.computeHeuristicOfBoardOld = computeHeuristicOfBoardOld;
-    function matchPatternsAt(playerColor, move, board) {
+    function matchPatternsAt(playerColor, move, board, searched) {
         var patternNames = [];
         var directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
         for (var i = 0; i < directions.length; i++) {
@@ -643,6 +648,9 @@ var GobangOnline;
                     node = node.children[ownership];
                     if (node.name) {
                         edgetPatternName = node.name;
+                        for (var k = 0; k <= j; k++) {
+                            searched[move.row + dy * k][move.column + dx * k] = true;
+                        }
                     }
                 }
                 else {
@@ -660,11 +668,17 @@ var GobangOnline;
     function computeHeuristicOfBoard(playerColor, board) {
         var playerPatterns = [];
         var opponentPatterns = [];
+        var searched = GobangOnline.buildSquareMatrix(board.size, false);
+        var searchedOpponent = GobangOnline.buildSquareMatrix(board.size, false);
         for (var i = 0; i < board.size; i++) {
             for (var j = 0; j < board.size; j++) {
                 var m = { row: i, column: j };
-                playerPatterns = playerPatterns.concat(this.matchPatternsAt(playerColor, m, board));
-                opponentPatterns = opponentPatterns.concat(this.matchPatternsAt(GobangOnline.getOpponentColor(playerColor), m, board));
+                if (!searched[i][j]) {
+                    playerPatterns = playerPatterns.concat(this.matchPatternsAt(playerColor, m, board, searched));
+                }
+                if (!searchedOpponent[i][j]) {
+                    opponentPatterns = opponentPatterns.concat(this.matchPatternsAt(GobangOnline.getOpponentColor(playerColor), m, board, searchedOpponent));
+                }
             }
         }
         return GobangOnline.alternativePatternsToScore(playerPatterns) - GobangOnline.alternativePatternsToScore(opponentPatterns) * 1.201;

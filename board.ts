@@ -7,21 +7,26 @@ module GobangOnline {
     return color == Color.Black ? Color.White : Color.Black;
   }
 
+  export function buildSquareMatrix(size:number, defaultValue:any) {
+    var matrix = [];
+    for (var i = 0; i < size; i++) {
+      matrix[i] = [];
+
+      for (var j = 0; j < size; j++) {
+        matrix[i][j] = defaultValue;
+      }
+    }
+
+    return matrix;
+  }
+
   export class Board {
     private table: Color[][];
     private moveLog: Move[];
 
     constructor(public size) {
-      this.table = [];
+      this.table = buildSquareMatrix(size, Color.Empty);
       this.moveLog = [];
-
-      for (var i = 0; i < size; i++) {
-        this.table[i] = [];
-
-        for (var j = 0; j < size; j++) {
-          this.table[i][j] = Color.Empty;
-        }
-      }
     }
 
     getMoveAt(id) {
