@@ -23,6 +23,7 @@ module GobangOnline {
     private distance:number;
     private oldCenter:{x:number; y:number};
     private center:{x:number; y:number};
+    private click:Phaser.Sound;
 
     init(aiDepth, maxCandidates) {
       this.aiDepth = aiDepth;
@@ -30,6 +31,7 @@ module GobangOnline {
     }
 
     create() {
+      this.click = this.add.audio('click');
       this.stageGroup = this.game.add.group();
       this.board = this.add.sprite(this.game.width/2, this.game.height/2, 'board');
       this.stageGroup.add(this.board);
@@ -58,6 +60,7 @@ module GobangOnline {
         piece.anchor.setTo(0.5, 0.5);
         piece.scale.setTo(30/piece.width);
         this.stageGroup.add(piece);
+        this.click.play();
       });
       this.engine.startGame();
     }

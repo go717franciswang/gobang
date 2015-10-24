@@ -38,6 +38,8 @@ var GobangOnline;
             this.load.image('board', '/resources/gobang/board.png');
             this.load.spritesheet('piece', '/resources/gobang/pieces.png', 100, 100, 2);
             this.load.bitmapFont('Castaway', '/resources/gobang/fonts/Castaway.png', '/resources/gobang/fonts/Castaway.xml');
+            this.load.audio('click', 'resources/gobang/click.mp3');
+            this.load.audio('beep', 'resources/gobang/beep.mp3');
             this.stage.smoothed = false;
         };
         Preloader.prototype.create = function () {
@@ -860,6 +862,7 @@ var GobangOnline;
         };
         SinglePlayer.prototype.create = function () {
             var _this = this;
+            this.click = this.add.audio('click');
             this.stageGroup = this.game.add.group();
             this.board = this.add.sprite(this.game.width / 2, this.game.height / 2, 'board');
             this.stageGroup.add(this.board);
@@ -886,6 +889,7 @@ var GobangOnline;
                 piece.anchor.setTo(0.5, 0.5);
                 piece.scale.setTo(30 / piece.width);
                 _this.stageGroup.add(piece);
+                _this.click.play();
             });
             this.engine.startGame();
         };
@@ -1001,6 +1005,7 @@ var GobangOnline;
             this.takingTurn = false;
         }
         MultiPlayer.prototype.create = function () {
+            this.click = this.add.audio('click');
             this.board = this.add.sprite(this.game.width / 2, this.game.height / 2, 'board');
             this.board.anchor.setTo(0.5, 0.5);
             var scale = this.game.height / this.board.height;
@@ -1150,6 +1155,7 @@ var GobangOnline;
                         else {
                             _this.localBoard.setColorAt(move, GobangOnline.Color.White);
                         }
+                        _this.click.play();
                         break;
                     case GobangOnline.MsgType.GameOver:
                         var txt = data.winnerColor == GobangOnline.Color.Black ? 'BLACK WINS' : 'WHITE WINS';

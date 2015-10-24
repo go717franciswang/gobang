@@ -27,8 +27,10 @@ module GobangOnline {
     private localBoard:Board;
     private timer:Phaser.Text;
     private turnBeganAt:number;
+    private click:Phaser.Sound;
 
     create() {
+      this.click = this.add.audio('click');
       this.board = this.add.sprite(this.game.width/2, this.game.height/2, 'board');
       this.board.anchor.setTo(0.5, 0.5);
       var scale: number = this.game.height / this.board.height;
@@ -199,6 +201,8 @@ module GobangOnline {
             } else {
               this.localBoard.setColorAt(move, Color.White);
             }
+
+            this.click.play();
           break;
           case MsgType.GameOver:
             var txt = data.winnerColor == Color.Black ? 'BLACK WINS' : 'WHITE WINS';
