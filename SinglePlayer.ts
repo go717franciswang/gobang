@@ -15,6 +15,7 @@ module GobangOnline {
     aiPlayer: AiPlayer;
     engine: Gobang;
     private aiDepth:number;
+    private maxCandidates:number;
     private pendingMove:Move;
     private stageGroup:Phaser.Group;
     private worldScale:number = 1;
@@ -23,8 +24,9 @@ module GobangOnline {
     private oldCenter:{x:number; y:number};
     private center:{x:number; y:number};
 
-    init(aiDepth) {
+    init(aiDepth, maxCandidates) {
       this.aiDepth = aiDepth;
+      this.maxCandidates = maxCandidates;
     }
 
     create() {
@@ -44,7 +46,7 @@ module GobangOnline {
         msg.anchor.setTo(0.5, 0.5);
       };
 
-      this.aiPlayer = new AiPlayer(this.aiDepth, 100);
+      this.aiPlayer = new AiPlayer(this.aiDepth, this.maxCandidates);
       this.engine = new Gobang(Settings.BOARD_SIZE, this.humanPlayer, this.aiPlayer);
       this.engine.setOnRegisterMove((player, move) => {
         var pos = this.move2position(move);
@@ -132,6 +134,6 @@ module GobangOnline {
       this.game.debug.text("Mouse: " + this.game.input.activePointer.clientX, 300, 132);
       this.game.debug.text("Mouse: " + this.game.input.activePointer.clientY, 300, 162);
     }
-  }
   */
+  }
 }

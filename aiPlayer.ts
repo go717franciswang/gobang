@@ -18,8 +18,8 @@ module GobangOnline {
     takeTurn(context: Gobang, lastMove: Move): void {
       // console.log('heuristics: ' + computeHeuristicOfBoard(this, context.board));
 
-      //var v = this.alphabeta(context.board, this.depth, -Infinity, Infinity, true);
-      var v = this.minimax(context.board, this.depth, true);
+      var v = this.alphabeta(context.board, this.depth, -Infinity, Infinity, true);
+      //var v = this.minimax(context.board, this.depth, true);
       console.log(v, this.maximizingMove);
       console.log('end turn');
       context.registerMove(this, this.maximizingMove);
@@ -28,7 +28,6 @@ module GobangOnline {
     minimax(node:Board, depth:number, maximizingPlayer:boolean):number {
       if (node.isGameOver(getOpponentColor(this.color))) return -Infinity;
       if (node.isGameOver(this.color)) return Infinity;
-
       if (depth == 0) return computeHeuristicOfBoard(this.color, node);
 
       if (maximizingPlayer) {
@@ -67,9 +66,9 @@ module GobangOnline {
     }
 
     alphabeta(node:Board, depth:number, alpha:number, beta:number, maximizingPlayer:boolean):number {
-      if (depth == 0) {
-        return computeHeuristicOfBoard(this.color, node);
-      }
+      if (node.isGameOver(getOpponentColor(this.color))) return -Infinity;
+      if (node.isGameOver(this.color)) return Infinity;
+      if (depth == 0) return computeHeuristicOfBoard(this.color, node);
 
       if (maximizingPlayer) {
         var v = alpha;

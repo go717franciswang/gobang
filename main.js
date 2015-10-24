@@ -78,13 +78,13 @@ var GobangOnline;
             this.background.scale.y = this.game.height / this.background.height;
             this.add.tween(this.background).to({ alpha: 1.0 }, 2000, Phaser.Easing.Bounce.InOut, true);
             GobangOnline.addButton(this.game, this.game.width / 2, this.game.height / 2 - 150, 'EASY', function () {
-                _this.game.state.start('SinglePlayer', true, false, 1);
+                _this.game.state.start('SinglePlayer', true, false, 1, 100);
             });
             GobangOnline.addButton(this.game, this.game.width / 2, this.game.height / 2, 'MEDIUM', function () {
-                _this.game.state.start('SinglePlayer', true, false, 2);
+                _this.game.state.start('SinglePlayer', true, false, 2, 50);
             });
             GobangOnline.addButton(this.game, this.game.width / 2, this.game.height / 2 + 150, 'HARD', function () {
-                _this.game.state.start('SinglePlayer', true, false, 3);
+                _this.game.state.start('SinglePlayer', true, false, 3, 50);
             });
         };
         return DifficultyMenu;
@@ -681,7 +681,7 @@ var GobangOnline;
                 }
             }
         }
-        return GobangOnline.alternativePatternsToScore(playerPatterns) - GobangOnline.alternativePatternsToScore(opponentPatterns) * 1.201;
+        return GobangOnline.alternativePatternsToScore(playerPatterns) - GobangOnline.alternativePatternsToScore(opponentPatterns) * 1.251;
     }
     GobangOnline.computeHeuristicOfBoard = computeHeuristicOfBoard;
 })(GobangOnline || (GobangOnline = {}));
@@ -697,7 +697,7 @@ var GobangOnline;
             this.color = color;
         };
         AiPlayer.prototype.takeTurn = function (context, lastMove) {
-            var v = this.minimax(context.board, this.depth, true);
+            var v = this.alphabeta(context.board, this.depth, -Infinity, Infinity, true);
             console.log(v, this.maximizingMove);
             console.log('end turn');
             context.registerMove(this, this.maximizingMove);
@@ -740,9 +740,12 @@ var GobangOnline;
             }
         };
         AiPlayer.prototype.alphabeta = function (node, depth, alpha, beta, maximizingPlayer) {
-            if (depth == 0) {
+            if (node.isGameOver(GobangOnline.getOpponentColor(this.color)))
+                return -Infinity;
+            if (node.isGameOver(this.color))
+                return Infinity;
+            if (depth == 0)
                 return GobangOnline.computeHeuristicOfBoard(this.color, node);
-            }
             if (maximizingPlayer) {
                 var v = alpha;
                 var maximizingMove;
@@ -851,8 +854,9 @@ var GobangOnline;
             _super.apply(this, arguments);
             this.worldScale = 1;
         }
-        SinglePlayer.prototype.init = function (aiDepth) {
+        SinglePlayer.prototype.init = function (aiDepth, maxCandidates) {
             this.aiDepth = aiDepth;
+            this.maxCandidates = maxCandidates;
         };
         SinglePlayer.prototype.create = function () {
             var _this = this;
@@ -871,7 +875,7 @@ var GobangOnline;
                 var msg = _this.game.add.bitmapText(_this.game.width / 2, _this.game.height / 2, 'Castaway', 'YOU LOST!');
                 msg.anchor.setTo(0.5, 0.5);
             };
-            this.aiPlayer = new GobangOnline.AiPlayer(this.aiDepth, 100);
+            this.aiPlayer = new GobangOnline.AiPlayer(this.aiDepth, this.maxCandidates);
             this.engine = new GobangOnline.Gobang(GobangOnline.Settings.BOARD_SIZE, this.humanPlayer, this.aiPlayer);
             this.engine.setOnRegisterMove(function (player, move) {
                 var pos = _this.move2position(move);
