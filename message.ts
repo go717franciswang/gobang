@@ -2,7 +2,7 @@
 
 module GobangOnline {
 
-  export enum MsgType { TakeTurn, Move, GameOver, NewPlayer, PopupText };
+  export enum MsgType { TakeTurn, Move, GameOver, NewPlayer, PopupText, Timer };
 
   export interface Message {
     type:MsgType;
@@ -10,5 +10,7 @@ module GobangOnline {
     moveId?:number;
     winnerColor?:Color;
     text?:string;
+    milliSecLeft?:number;
+    color?:Color;
   }
 }

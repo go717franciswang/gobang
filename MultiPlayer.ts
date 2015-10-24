@@ -25,8 +25,11 @@ module GobangOnline {
     private takingTurn = false;
     private pendingMove:Move;
     private localBoard:Board;
-    private timer:Phaser.Text;
+    private timer1:Phaser.Text;
+    private timer2:Phaser.Text;
     private turnBeganAt:number;
+    private milliSecLeft1:number;
+    private milliSecLeft2:number;
     private click:Phaser.Sound;
     private beep:Phaser.Sound;
 
@@ -39,6 +42,12 @@ module GobangOnline {
       this.board.scale.setTo(scale, scale);
       this.createServerIfNotExist();
       this.localBoard = new Board(Settings.BOARD_SIZE);
+
+      var style = { font: "bold 32px Arial", fill: "#fff", boundsAlignH: "center", boundsAlignV: "middle" };
+      this.timer1 = this.add.text(this.game.width-25, 0, Settings.MAX_SECONDS_PER_GAME.toString(), style);
+      this.timer1.anchor.setTo(1, 0);
+      this.timer2 = this.add.text(this.game.width-25, 30, Settings.MAX_SECONDS_PER_GAME.toString(), style);
+      this.timer2.anchor.setTo(1, 0);
     }
 
     createServerIfNotExist() {
@@ -71,22 +80,24 @@ module GobangOnline {
               this.engine.blackPlayer.send({ type: MsgType.PopupText, text: 'GAME BEGAN\nYOU ARE BLACK' });
               this.engine.whitePlayer.send({ type: MsgType.PopupText, text: 'GAME BEGAN\nYOU ARE WHITE' });
 
-              this.engine.blackPlayer.onTakeTurnCallback = (moveCountBeforeTurn:number) => {
+              this.engine.blackPlayer.onTakeTurnCallback = (moveCountBeforeTurn:number, milliSecLeft:number) => {
+                this.broadCast({ type: MsgType.Timer, milliSecLeft: milliSecLeft, color: Color.Black });
                 setTimeout(() => {
                   // if no new move was made after many seconds
                   if (moveCountBeforeTurn == this.engine.board.getMoveCount()) {
                     this.declareWinner(Color.White);
                   }
-                }, (Settings.MAX_WAIT_PER_MOVE+1)*1000);
+                }, milliSecLeft + 1000);
               };
 
-              this.engine.whitePlayer.onTakeTurnCallback = (moveCountBeforeTurn:number) => {
+              this.engine.whitePlayer.onTakeTurnCallback = (moveCountBeforeTurn:number, milliSecLeft:number) => {
+                this.broadCast({ type: MsgType.Timer, milliSecLeft: milliSecLeft, color: Color.White });
                 setTimeout(() => {
                   // if no new move was made after many seconds
                   if (moveCountBeforeTurn == this.engine.board.getMoveCount()) {
                     this.declareWinner(Color.Black);
                   }
-                }, (Settings.MAX_WAIT_PER_MOVE+1)*1000);
+                }, milliSecLeft + 1000);
               };
 
               this.engine.startGame();
@@ -178,13 +189,18 @@ module GobangOnline {
       this.connToServer.on('data', (data) => {
         console.log('client got message: ', data);
         switch(data.type) {
+          case GobangOnline.MsgType.Timer:
+            this.turnBeganAt = (new Date()).getTime();
+            if (data.color == Color.Black) {
+              this.milliSecLeft1 = data.milliSecLeft;
+              this.milliSecLeft2 = null;
+            } else {
+              this.milliSecLeft2 = data.milliSecLeft;
+              this.milliSecLeft1 = null;
+            }
+          break;
           case GobangOnline.MsgType.TakeTurn:
             this.takingTurn = true;
-            this.turnBeganAt = (new Date()).getTime();
-            var style = { font: "bold 32px Arial", fill: "#fff", boundsAlignH: "center", boundsAlignV: "middle" };
-            this.timer = this.add.text(this.game.width-25, 0, Settings.MAX_WAIT_PER_MOVE.toString(), style);
-            this.timer.anchor.setTo(1, 0);
-
           break;
           case MsgType.Move:
             var move:Move = data.move;
@@ -221,13 +237,24 @@ module GobangOnline {
     }
 
     update() {
-      if (this.takingTurn) {
-        var move = this.position2move(this.game.input.activePointer);
-        var secondsLeft = Math.max(0, Settings.MAX_WAIT_PER_MOVE - Math.floor((new Date().getTime() - this.turnBeganAt)/1000));
-        if (secondsLeft != parseInt(this.timer.text) && secondsLeft < 5) {
+      if (this.milliSecLeft1) {
+        var secondsLeft = Math.max(0, Math.ceil((this.milliSecLeft1 - (new Date().getTime() - this.turnBeganAt))/1000));
+        if (secondsLeft != parseInt(this.timer1.text) && secondsLeft < 30) {
           this.beep.play();
         }
-        this.timer.setText(secondsLeft.toString());
+        this.timer1.setText(secondsLeft.toString());
+      }
+
+      if (this.milliSecLeft2) {
+        var secondsLeft = Math.max(0, Math.ceil((this.milliSecLeft2 - (new Date().getTime() - this.turnBeganAt))/1000));
+        if (secondsLeft != parseInt(this.timer2.text) && secondsLeft < 30) {
+          this.beep.play();
+        }
+        this.timer2.setText(secondsLeft.toString());
+      }
+
+      if (this.takingTurn) {
+        var move = this.position2move(this.game.input.activePointer);
 
         if (this.game.input.activePointer.isDown) {
           if (this.localBoard.isMoveValid(move) && !this.pendingMove) {
@@ -240,9 +267,6 @@ module GobangOnline {
           }
           this.pendingMove = null;
         }
-      } else if (this.timer) {
-        this.timer.destroy();
-        this.timer = null;
       }
     }
 
