@@ -1006,6 +1006,7 @@ var GobangOnline;
         }
         MultiPlayer.prototype.create = function () {
             this.click = this.add.audio('click');
+            this.beep = this.add.audio('beep');
             this.board = this.add.sprite(this.game.width / 2, this.game.height / 2, 'board');
             this.board.anchor.setTo(0.5, 0.5);
             var scale = this.game.height / this.board.height;
@@ -1174,6 +1175,9 @@ var GobangOnline;
             if (this.takingTurn) {
                 var move = this.position2move(this.game.input.activePointer);
                 var secondsLeft = Math.max(0, GobangOnline.Settings.MAX_WAIT_PER_MOVE - Math.floor((new Date().getTime() - this.turnBeganAt) / 1000));
+                if (secondsLeft != parseInt(this.timer.text) && secondsLeft < 5) {
+                    this.beep.play();
+                }
                 this.timer.setText(secondsLeft.toString());
                 if (this.game.input.activePointer.isDown) {
                     if (this.localBoard.isMoveValid(move) && !this.pendingMove) {

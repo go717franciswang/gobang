@@ -28,9 +28,11 @@ module GobangOnline {
     private timer:Phaser.Text;
     private turnBeganAt:number;
     private click:Phaser.Sound;
+    private beep:Phaser.Sound;
 
     create() {
       this.click = this.add.audio('click');
+      this.beep = this.add.audio('beep');
       this.board = this.add.sprite(this.game.width/2, this.game.height/2, 'board');
       this.board.anchor.setTo(0.5, 0.5);
       var scale: number = this.game.height / this.board.height;
@@ -222,6 +224,9 @@ module GobangOnline {
       if (this.takingTurn) {
         var move = this.position2move(this.game.input.activePointer);
         var secondsLeft = Math.max(0, Settings.MAX_WAIT_PER_MOVE - Math.floor((new Date().getTime() - this.turnBeganAt)/1000));
+        if (secondsLeft != parseInt(this.timer.text) && secondsLeft < 5) {
+          this.beep.play();
+        }
         this.timer.setText(secondsLeft.toString());
 
         if (this.game.input.activePointer.isDown) {
