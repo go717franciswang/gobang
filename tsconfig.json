@@ -30,6 +30,7 @@
         "./Preloader.ts",
         "./RTCPeerConnection.d.ts",
         "./SinglePlayer.ts",
+        "./Test.ts",
         "./aiPlayer.ts",
         "./board.ts",
         "./gobang.ts",

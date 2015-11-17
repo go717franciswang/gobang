@@ -1260,3 +1260,24 @@ var GobangOnline;
 window.onload = function () {
     var game = new GobangOnline.Game();
 };
+var GobangOnline;
+(function (GobangOnline) {
+    function loadBoard(data) {
+        var rows = data.split("\n");
+        var size = rows.length;
+        var board = new GobangOnline.Board(size);
+        for (var i = 0; i < size; i++) {
+            var row = rows[i].trim();
+            for (var j = 0; j < size; j++) {
+                if (row[j] == "1") {
+                    board.setColorAt({ row: i, column: j }, GobangOnline.Color.Black);
+                }
+                else if (row[j] == "2") {
+                    board.setColorAt({ row: i, column: j }, GobangOnline.Color.White);
+                }
+            }
+        }
+        return board;
+    }
+    GobangOnline.loadBoard = loadBoard;
+})(GobangOnline || (GobangOnline = {}));
