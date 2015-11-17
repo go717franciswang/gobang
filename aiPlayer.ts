@@ -3,12 +3,15 @@
 /// <reference path="./board.ts"/>
 
 module GobangOnline {
+  export enum Algo { Minimax, Alphabeta };
+
   export class AiPlayer implements Player {
     public color: Color;
-    private maximizingMove: Move;
+    private solver: Solver;
 
     constructor(private depth:number, private maxCandidates:number) {
       console.log(this.depth, this.maxCandidates);
+      this.solver = new Solver(this.color, this.depth, this.maxCandidates, Algo.Alphabeta);
     }
 
     setColor(color: Color) {
@@ -18,11 +21,40 @@ module GobangOnline {
     takeTurn(context: Gobang, lastMove: Move): void {
       // console.log('heuristics: ' + computeHeuristicOfBoard(this, context.board));
 
-      var v = this.alphabeta(context.board, this.depth, -Infinity, Infinity, true);
-      //var v = this.minimax(context.board, this.depth, true);
-      console.log(v, this.maximizingMove);
+      var maximizingMove = this.solver.solve(context.board);
+      console.log(maximizingMove);
       console.log('end turn');
-      context.registerMove(this, this.maximizingMove);
+      context.registerMove(this, maximizingMove);
+    }
+
+    badMove(context: Gobang, badMove: Move): void {
+
+    }
+
+    win(): void {
+
+    }
+
+    lose(): void {
+
+    }
+  }
+
+  export class Solver {
+    private maximizingMove: Move;
+
+    constructor(private color:Color, private depth:number, private maxCandidates:number, private algo:Algo) { }
+
+    solve(node:Board) {
+      this.maximizingMove = null;
+
+      if (this.algo == Algo.Minimax) {
+        this.minimax(node, this.depth, true);
+        return this.maximizingMove;
+      } else if (this.algo == Algo.Alphabeta) {
+        this.alphabeta(node, this.depth, -Infinity, Infinity, true);
+        return this.maximizingMove;
+      }
     }
 
     minimax(node:Board, depth:number, maximizingPlayer:boolean):number {
@@ -159,18 +191,6 @@ module GobangOnline {
 
       //console.log(candidates);
       return candidates;
-    }
-
-    badMove(context: Gobang, badMove: Move): void {
-
-    }
-
-    win(): void {
-
-    }
-
-    lose(): void {
-
     }
   }
 }
