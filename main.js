@@ -1304,33 +1304,43 @@ var GobangOnline;
                 else if (row[j] == "o") {
                     board.setColorAt(m, GobangOnline.Color.White);
                 }
-                else if (row[j] == "@") {
+                else if (row[j] == "?") {
                     acceptableAnwsers.push(m);
                 }
             }
         }
         return { board: board, acceptableAnwsers: acceptableAnwsers };
     }
-    function assertAcceptableAnser(answer, acceptableAnwsers) {
+    function assertAcceptableAnser(answer, acceptableAnwsers, data) {
         for (var i = 0; i < acceptableAnwsers.length; i++) {
             var validAnswer = acceptableAnwsers[i];
             if (answer.row == validAnswer.row && answer.column == validAnswer.column)
                 return;
+        }
+        for (var i = 0; i < data.length; i++) {
+            var id = "" + i + "|";
+            if (answer.row == i) {
+                var row = data[i].substr(0, answer.column) + "O" + data[i].substr(answer.column + 1, data[i].length - answer.column - 1);
+                console.log(id + row);
+            }
+            else {
+                console.log(id + data[i]);
+            }
         }
         throw "Assertion failed: expected " + JSON.stringify(acceptableAnwsers) + ", got " + JSON.stringify(answer);
     }
     function test1() {
         var data = [".......",
             ".......",
-            ".o.o.@.",
+            ".o.o.?.",
             "..oxx..",
             ".xox...",
             "..x....",
-            ".@....."];
+            ".?....."];
         var info = loadBoard(data);
         var solver = new GobangOnline.Solver(GobangOnline.Color.White, 1, 100, GobangOnline.Algo.Alphabeta);
         var m = solver.solve(info.board);
-        assertAcceptableAnser(m, info.acceptableAnwsers);
+        assertAcceptableAnser(m, info.acceptableAnwsers, data);
     }
     GobangOnline.test1 = test1;
 })(GobangOnline || (GobangOnline = {}));
