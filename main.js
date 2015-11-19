@@ -461,7 +461,7 @@ var GobangOnline;
         },
         {
             "patternNames": { "活三": 1 },
-            "score": 200
+            "score": 800
         },
         {
             "patternNames": { "活二": 2 },
@@ -1311,12 +1311,19 @@ var GobangOnline;
         }
         return { board: board, acceptableAnwsers: acceptableAnwsers };
     }
-    function assertAcceptableAnser(answer, acceptableAnwsers, data) {
+    function assertAcceptableAnser(answer, acceptableAnwsers, data, testTitle) {
         for (var i = 0; i < acceptableAnwsers.length; i++) {
             var validAnswer = acceptableAnwsers[i];
-            if (answer.row == validAnswer.row && answer.column == validAnswer.column)
+            if (answer.row == validAnswer.row && answer.column == validAnswer.column) {
+                printBoard(answer, data);
+                console.log(testTitle + " passed");
                 return;
+            }
         }
+        printBoard(answer, data);
+        throw "Assertion failed for " + testTitle + ": expected " + JSON.stringify(acceptableAnwsers) + ", got " + JSON.stringify(answer);
+    }
+    function printBoard(answer, data) {
         for (var i = 0; i < data.length; i++) {
             var id = "" + i + "|";
             if (answer.row == i) {
@@ -1327,7 +1334,6 @@ var GobangOnline;
                 console.log(id + data[i]);
             }
         }
-        throw "Assertion failed: expected " + JSON.stringify(acceptableAnwsers) + ", got " + JSON.stringify(answer);
     }
     function test1() {
         var data = [".......",
@@ -1338,9 +1344,53 @@ var GobangOnline;
             "..x....",
             ".?....."];
         var info = loadBoard(data);
-        var solver = new GobangOnline.Solver(GobangOnline.Color.White, 1, 100, GobangOnline.Algo.Alphabeta);
-        var m = solver.solve(info.board);
-        assertAcceptableAnser(m, info.acceptableAnwsers, data);
+        var m1 = new GobangOnline.Solver(GobangOnline.Color.White, 1, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
+        assertAcceptableAnser(m1, info.acceptableAnwsers, data, "Easy AI");
+        var m2 = new GobangOnline.Solver(GobangOnline.Color.White, 2, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
+        assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Intermediate AI");
+        var m3 = new GobangOnline.Solver(GobangOnline.Color.White, 3, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
+        assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Advanced AI");
     }
     GobangOnline.test1 = test1;
+    function test2() {
+        var data = [".......",
+            "..o.o.o",
+            "..oxxx.",
+            "..oox..",
+            "..?xx..",
+            "..xx?..",
+            ".o..?.."];
+        var info = loadBoard(data);
+        var m1 = new GobangOnline.Solver(GobangOnline.Color.White, 1, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
+        assertAcceptableAnser(m1, info.acceptableAnwsers, data, "Easy AI");
+        var m2 = new GobangOnline.Solver(GobangOnline.Color.White, 2, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
+        assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Intermediate AI");
+        var m3 = new GobangOnline.Solver(GobangOnline.Color.White, 3, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
+        assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Advanced AI");
+    }
+    GobangOnline.test2 = test2;
+    function test3() {
+        var data = ["........",
+            "........",
+            "........",
+            "...o....",
+            "....o...",
+            "...?xxx?",
+            "......o.",
+            "........"];
+        var info = loadBoard(data);
+        var m1 = new GobangOnline.Solver(GobangOnline.Color.White, 1, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
+        assertAcceptableAnser(m1, info.acceptableAnwsers, data, "Easy AI");
+        var m2 = new GobangOnline.Solver(GobangOnline.Color.White, 2, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
+        assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Intermediate AI");
+        var m3 = new GobangOnline.Solver(GobangOnline.Color.White, 3, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
+        assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Advanced AI");
+    }
+    GobangOnline.test3 = test3;
+    function testAll() {
+        test1();
+        test2();
+        test3();
+    }
+    GobangOnline.testAll = testAll;
 })(GobangOnline || (GobangOnline = {}));

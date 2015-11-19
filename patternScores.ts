@@ -109,7 +109,7 @@ module GobangOnline {
     },
     {
       "patternNames": { "活三": 1 },
-      "score": 200
+      "score": 800
     },
     {
       "patternNames": { "活二": 2 },
