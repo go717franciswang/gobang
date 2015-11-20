@@ -299,6 +299,9 @@ var GobangOnline;
                 return;
             }
             this.board.setColorAt(move, player.color);
+            if (this.onRegisterMove) {
+                this.onRegisterMove(player, move);
+            }
             if (this.isGameOver(player)) {
                 this.gameOver = true;
                 player.win();
@@ -310,9 +313,6 @@ var GobangOnline;
             }
             this.swapPlayingPendingState();
             this.pendingPlayer.takeTurn(this, move);
-            if (this.onRegisterMove) {
-                this.onRegisterMove(player, move);
-            }
         };
         Gobang.prototype.swapPlayingPendingState = function () {
             var tmp = this.pendingPlayer;
