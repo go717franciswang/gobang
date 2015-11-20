@@ -879,7 +879,6 @@ var GobangOnline;
         __extends(SinglePlayer, _super);
         function SinglePlayer() {
             _super.apply(this, arguments);
-            this.worldScale = 1;
         }
         SinglePlayer.prototype.init = function (aiDepth, maxCandidates) {
             this.aiDepth = aiDepth;
@@ -888,9 +887,7 @@ var GobangOnline;
         SinglePlayer.prototype.create = function () {
             var _this = this;
             this.click = this.add.audio('click');
-            this.stageGroup = this.game.add.group();
             this.board = this.add.sprite(this.game.width / 2, this.game.height / 2, 'board');
-            this.stageGroup.add(this.board);
             this.board.anchor.setTo(0.5, 0.5);
             var scale = this.game.height / this.board.height;
             this.board.scale.setTo(scale, scale);
@@ -913,7 +910,6 @@ var GobangOnline;
                 }
                 piece.anchor.setTo(0.5, 0.5);
                 piece.scale.setTo(30 / piece.width);
-                _this.stageGroup.add(piece);
                 _this.click.play();
             });
             this.engine.startGame();
@@ -931,36 +927,7 @@ var GobangOnline;
             };
         };
         SinglePlayer.prototype.update = function () {
-            if (this.input.pointer1.isDown && this.input.pointer2.isDown) {
-                this.oldCenter = this.center;
-                this.center = { x: (this.input.pointer1.x + this.input.pointer2.x) / 2, y: (this.input.pointer1.y + this.input.pointer2.y) / 2 };
-                this.oldDistance = this.distance;
-                this.distance = Phaser.Math.distance(this.input.pointer1.x, this.input.pointer1.y, this.input.pointer2.x, this.input.pointer2.y);
-                var delta = Math.abs(this.oldDistance - this.distance);
-                if (delta > 4) {
-                    if (this.oldDistance < this.distance) {
-                        this.worldScale -= 0.02;
-                    }
-                    else {
-                        this.worldScale += 0.02;
-                    }
-                    this.worldScale = Phaser.Math.clamp(this.worldScale, 0.5, 1.5);
-                    this.stageGroup.scale.set(this.worldScale);
-                }
-                else {
-                    if (Math.abs(this.center.x - this.oldCenter.x) > 4) {
-                        if (this.center.x > this.oldCenter.x) {
-                            this.camera.x += 4;
-                        }
-                    }
-                    if (Math.abs(this.center.y - this.oldCenter.y) > 4) {
-                        if (this.center.y > this.oldCenter.y) {
-                            this.camera.y += 4;
-                        }
-                    }
-                }
-            }
-            else if (this.humanPlayer.takingTurn) {
+            if (this.humanPlayer.takingTurn) {
                 var move = this.position2move(this.game.input.activePointer);
                 if (this.game.input.activePointer.isDown) {
                     if (this.engine.board.isMoveValid(move) && !this.pendingMove) {
