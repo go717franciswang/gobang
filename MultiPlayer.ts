@@ -226,6 +226,7 @@ module GobangOnline {
             var txt = data.winnerColor == Color.Black ? 'BLACK WINS' : 'WHITE WINS';
             var msg = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'Castaway', txt);
             msg.anchor.setTo(0.5, 0.5);
+            addMenuButton(this.game);
           break;
           case MsgType.PopupText:
             var msg = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'Castaway', data.text);

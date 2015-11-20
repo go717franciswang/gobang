@@ -5,6 +5,7 @@
 /// <reference path="./humanPlayer.ts"/>
 /// <reference path="./aiPlayer.ts"/>
 /// <reference path="./settings.ts"/>
+/// <reference path="./Preloader.ts"/>
 
 module GobangOnline {
 
@@ -34,10 +35,12 @@ module GobangOnline {
       this.humanPlayer.onWinCallback = () => {
         var msg = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'Castaway', 'YOU WON!');
         msg.anchor.setTo(0.5, 0.5);
+        addMenuButton(this.game);
       };
       this.humanPlayer.onLossCallback = () => {
         var msg = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'Castaway', 'YOU LOST!');
         msg.anchor.setTo(0.5, 0.5);
+        addMenuButton(this.game);
       };
 
       this.aiPlayer = new AiPlayer(this.aiDepth, this.maxCandidates);

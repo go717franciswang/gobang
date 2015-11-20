@@ -64,6 +64,12 @@ var GobangOnline;
         return group;
     }
     GobangOnline.addButton = addButton;
+    function addMenuButton(game) {
+        addButton(game, game.width / 2, game.height / 2 + 150, 'MENU', function () {
+            game.state.start('MainMenu', true, false, 3, 50);
+        });
+    }
+    GobangOnline.addMenuButton = addMenuButton;
 })(GobangOnline || (GobangOnline = {}));
 var GobangOnline;
 (function (GobangOnline) {
@@ -909,10 +915,12 @@ var GobangOnline;
             this.humanPlayer.onWinCallback = function () {
                 var msg = _this.game.add.bitmapText(_this.game.width / 2, _this.game.height / 2, 'Castaway', 'YOU WON!');
                 msg.anchor.setTo(0.5, 0.5);
+                GobangOnline.addMenuButton(_this.game);
             };
             this.humanPlayer.onLossCallback = function () {
                 var msg = _this.game.add.bitmapText(_this.game.width / 2, _this.game.height / 2, 'Castaway', 'YOU LOST!');
                 msg.anchor.setTo(0.5, 0.5);
+                GobangOnline.addMenuButton(_this.game);
             };
             this.aiPlayer = new GobangOnline.AiPlayer(this.aiDepth, this.maxCandidates);
             this.engine = new GobangOnline.Gobang(GobangOnline.Settings.BOARD_SIZE, this.humanPlayer, this.aiPlayer);
@@ -1177,6 +1185,7 @@ var GobangOnline;
                         var txt = data.winnerColor == GobangOnline.Color.Black ? 'BLACK WINS' : 'WHITE WINS';
                         var msg = _this.game.add.bitmapText(_this.game.width / 2, _this.game.height / 2, 'Castaway', txt);
                         msg.anchor.setTo(0.5, 0.5);
+                        GobangOnline.addMenuButton(_this.game);
                         break;
                     case GobangOnline.MsgType.PopupText:
                         var msg = _this.game.add.bitmapText(_this.game.width / 2, _this.game.height / 2, 'Castaway', data.text);

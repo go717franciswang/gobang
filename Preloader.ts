@@ -33,6 +33,7 @@ module GobangOnline {
       this.game.state.start('MainMenu', true, false);
     }
   }
+  
   export function addButton(game:Phaser.Game, x:number, y:number, text:string, callback:Function):Phaser.Group {
     var button = game.add.button(x, y, 'button', callback);
     button.anchor.setTo(0.5, 0.5);
@@ -44,5 +45,11 @@ module GobangOnline {
     group.addChild(bitmapText);
 
     return group;
+  }
+
+  export function addMenuButton(game:Phaser.Game) {
+    addButton(game, game.width/2, game.height/2+150, 'MENU', () => {
+      game.state.start('MainMenu', true, false, 3, 50);
+    });
   }
 }
