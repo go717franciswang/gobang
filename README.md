@@ -10,3 +10,8 @@
 ### Sound
 * [KorgMS2000B](https://freesound.org/people/KorgMS2000B/)
 * [Cheeseheadburger](https://freesound.org/people/Cheeseheadburger/)
+
+### Algorithm and Patterns
+* [基于α-β剪枝算法的智能五子棋](http://zjh776.iteye.com/blog/1979748)
+* [Search Algorithm in the Five-piece Chess](http://cisjournal.org/journalofcomputing/archive/vol3no4/vol3no4_19.pdf)
+* [【入门】五子棋断奶班基础知识第二版](http://tieba.baidu.com/p/2180847383)
