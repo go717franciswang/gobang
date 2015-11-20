@@ -7,7 +7,7 @@ module GobangOnline {
   // x represents black
   // o represents white
   // ? represents an acceptable answer
-  // O represents new AI move
+  // 💻 represents new AI move
   function loadBoard(data: string[]): { board:Board, acceptableAnwsers:Move[] } {
     var size = data.length;
     var board = new Board(size);
@@ -49,7 +49,7 @@ module GobangOnline {
     for (var i = 0; i < data.length; i++) {
       var id = ""+i+"|";
       if (answer.row == i) {
-        var row = data[i].substr(0, answer.column) + "O" + data[i].substr(answer.column+1, data[i].length-answer.column-1);
+        var row = data[i].substr(0, answer.column) + "💻" + data[i].substr(answer.column+1, data[i].length-answer.column-1);
         console.log(id+row);
       } else {
         console.log(id+data[i]);
@@ -101,20 +101,20 @@ module GobangOnline {
     var data = ["........",
                 "........",
                 "........",
-                "...o....",
-                "....o...",
-                "...?xxx?",
-                "......o.",
+                "...x....",
+                "....x...",
+                "...?ooo?",
+                "......x.",
                 "........"];
     var info = loadBoard(data);
 
-    var m1 = new Solver(Color.White, 1, 100, Algo.Alphabeta).solve(info.board);
+    var m1 = new Solver(Color.Black, 1, 100, Algo.Alphabeta).solve(info.board);
     assertAcceptableAnser(m1, info.acceptableAnwsers, data, "Easy AI"); // this test passes, but it makes the wrong move in game!!!
 
-    var m2 = new Solver(Color.White, 2, 100, Algo.Alphabeta).solve(info.board);
+    var m2 = new Solver(Color.Black, 2, 100, Algo.Alphabeta).solve(info.board);
     assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Intermediate AI");
 
-    var m3 = new Solver(Color.White, 3, 100, Algo.Alphabeta).solve(info.board);
+    var m3 = new Solver(Color.Black, 3, 100, Algo.Alphabeta).solve(info.board);
     assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Advanced AI");
   }
 

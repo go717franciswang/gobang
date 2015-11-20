@@ -11,7 +11,7 @@ module GobangOnline {
 
     constructor(private depth:number, private maxCandidates:number) {
       console.log(this.depth, this.maxCandidates);
-      this.solver = new Solver(this.color, this.depth, this.maxCandidates, Algo.Alphabeta);
+
     }
 
     setColor(color: Color) {
@@ -21,6 +21,7 @@ module GobangOnline {
     takeTurn(context: Gobang, lastMove: Move): void {
       // console.log('heuristics: ' + computeHeuristicOfBoard(this, context.board));
 
+      this.solver = new Solver(this.color, this.depth, this.maxCandidates, Algo.Alphabeta);
       var maximizingMove = this.solver.solve(context.board);
       console.log(maximizingMove);
       console.log('end turn');
@@ -48,13 +49,9 @@ module GobangOnline {
     solve(node:Board) {
       this.maximizingMove = null;
 
-      if (this.algo == Algo.Minimax) {
-        this.minimax(node, this.depth, true);
-        return this.maximizingMove;
-      } else if (this.algo == Algo.Alphabeta) {
-        this.alphabeta(node, this.depth, -Infinity, Infinity, true);
-        return this.maximizingMove;
-      }
+      if (this.algo == Algo.Minimax) this.minimax(node, this.depth, true);
+      else if (this.algo == Algo.Alphabeta) this.alphabeta(node, this.depth, -Infinity, Infinity, true);
+      return this.maximizingMove;
     }
 
     minimax(node:Board, depth:number, maximizingPlayer:boolean):number {

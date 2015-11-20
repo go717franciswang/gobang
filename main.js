@@ -700,12 +700,12 @@ var GobangOnline;
             this.depth = depth;
             this.maxCandidates = maxCandidates;
             console.log(this.depth, this.maxCandidates);
-            this.solver = new Solver(this.color, this.depth, this.maxCandidates, Algo.Alphabeta);
         }
         AiPlayer.prototype.setColor = function (color) {
             this.color = color;
         };
         AiPlayer.prototype.takeTurn = function (context, lastMove) {
+            this.solver = new Solver(this.color, this.depth, this.maxCandidates, Algo.Alphabeta);
             var maximizingMove = this.solver.solve(context.board);
             console.log(maximizingMove);
             console.log('end turn');
@@ -729,14 +729,11 @@ var GobangOnline;
         }
         Solver.prototype.solve = function (node) {
             this.maximizingMove = null;
-            if (this.algo == Algo.Minimax) {
+            if (this.algo == Algo.Minimax)
                 this.minimax(node, this.depth, true);
-                return this.maximizingMove;
-            }
-            else if (this.algo == Algo.Alphabeta) {
+            else if (this.algo == Algo.Alphabeta)
                 this.alphabeta(node, this.depth, -Infinity, Infinity, true);
-                return this.maximizingMove;
-            }
+            return this.maximizingMove;
         };
         Solver.prototype.minimax = function (node, depth, maximizingPlayer) {
             if (node.isGameOver(GobangOnline.getOpponentColor(this.color)))
@@ -1327,7 +1324,7 @@ var GobangOnline;
         for (var i = 0; i < data.length; i++) {
             var id = "" + i + "|";
             if (answer.row == i) {
-                var row = data[i].substr(0, answer.column) + "O" + data[i].substr(answer.column + 1, data[i].length - answer.column - 1);
+                var row = data[i].substr(0, answer.column) + "💻" + data[i].substr(answer.column + 1, data[i].length - answer.column - 1);
                 console.log(id + row);
             }
             else {
@@ -1373,17 +1370,17 @@ var GobangOnline;
         var data = ["........",
             "........",
             "........",
-            "...o....",
-            "....o...",
-            "...?xxx?",
-            "......o.",
+            "...x....",
+            "....x...",
+            "...?ooo?",
+            "......x.",
             "........"];
         var info = loadBoard(data);
-        var m1 = new GobangOnline.Solver(GobangOnline.Color.White, 1, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
+        var m1 = new GobangOnline.Solver(GobangOnline.Color.Black, 1, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
         assertAcceptableAnser(m1, info.acceptableAnwsers, data, "Easy AI");
-        var m2 = new GobangOnline.Solver(GobangOnline.Color.White, 2, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
+        var m2 = new GobangOnline.Solver(GobangOnline.Color.Black, 2, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
         assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Intermediate AI");
-        var m3 = new GobangOnline.Solver(GobangOnline.Color.White, 3, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
+        var m3 = new GobangOnline.Solver(GobangOnline.Color.Black, 3, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
         assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Advanced AI");
     }
     GobangOnline.test3 = test3;
