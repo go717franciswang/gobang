@@ -142,6 +142,20 @@ var GobangOnline;
         return matrix;
     }
     GobangOnline.buildSquareMatrix = buildSquareMatrix;
+    function move2position(move) {
+        return {
+            x: move.column * (GobangOnline.Settings.BOARD_X_END - GobangOnline.Settings.BOARD_X_START) / (GobangOnline.Settings.BOARD_SIZE - 1) + GobangOnline.Settings.BOARD_X_START,
+            y: move.row * (GobangOnline.Settings.BOARD_Y_END - GobangOnline.Settings.BOARD_Y_START) / (GobangOnline.Settings.BOARD_SIZE - 1) + GobangOnline.Settings.BOARD_Y_START
+        };
+    }
+    GobangOnline.move2position = move2position;
+    function position2move(position) {
+        return {
+            row: Math.round((position.y - GobangOnline.Settings.BOARD_Y_START) / ((GobangOnline.Settings.BOARD_Y_END - GobangOnline.Settings.BOARD_Y_START) / (GobangOnline.Settings.BOARD_SIZE - 1))),
+            column: Math.round((position.x - GobangOnline.Settings.BOARD_X_START) / ((GobangOnline.Settings.BOARD_X_END - GobangOnline.Settings.BOARD_X_START) / (GobangOnline.Settings.BOARD_SIZE - 1)))
+        };
+    }
+    GobangOnline.position2move = position2move;
     var Board = (function () {
         function Board(size) {
             this.size = size;
@@ -903,7 +917,7 @@ var GobangOnline;
             this.aiPlayer = new GobangOnline.AiPlayer(this.aiDepth, this.maxCandidates);
             this.engine = new GobangOnline.Gobang(GobangOnline.Settings.BOARD_SIZE, this.humanPlayer, this.aiPlayer);
             this.engine.setOnRegisterMove(function (player, move) {
-                var pos = _this.move2position(move);
+                var pos = GobangOnline.move2position(move);
                 var piece = _this.add.sprite(pos.x, pos.y, 'piece');
                 if (player.color == GobangOnline.Color.White) {
                     piece.frame = 1;
@@ -914,21 +928,9 @@ var GobangOnline;
             });
             this.engine.startGame();
         };
-        SinglePlayer.prototype.move2position = function (move) {
-            return {
-                x: move.column * (GobangOnline.Settings.BOARD_X_END - GobangOnline.Settings.BOARD_X_START) / (GobangOnline.Settings.BOARD_SIZE - 1) + GobangOnline.Settings.BOARD_X_START,
-                y: move.row * (GobangOnline.Settings.BOARD_Y_END - GobangOnline.Settings.BOARD_Y_START) / (GobangOnline.Settings.BOARD_SIZE - 1) + GobangOnline.Settings.BOARD_Y_START
-            };
-        };
-        SinglePlayer.prototype.position2move = function (position) {
-            return {
-                row: Math.round((position.y - GobangOnline.Settings.BOARD_Y_START) / ((GobangOnline.Settings.BOARD_Y_END - GobangOnline.Settings.BOARD_Y_START) / (GobangOnline.Settings.BOARD_SIZE - 1))),
-                column: Math.round((position.x - GobangOnline.Settings.BOARD_X_START) / ((GobangOnline.Settings.BOARD_X_END - GobangOnline.Settings.BOARD_X_START) / (GobangOnline.Settings.BOARD_SIZE - 1)))
-            };
-        };
         SinglePlayer.prototype.update = function () {
             if (this.humanPlayer.takingTurn) {
-                var move = this.position2move(this.game.input.activePointer);
+                var move = GobangOnline.position2move(this.game.input.activePointer);
                 if (this.game.input.activePointer.isDown) {
                     if (this.engine.board.isMoveValid(move) && !this.pendingMove) {
                         this.pendingMove = move;
@@ -1155,7 +1157,7 @@ var GobangOnline;
                         break;
                     case GobangOnline.MsgType.Move:
                         var move = data.move;
-                        var pos = _this.move2position(move);
+                        var pos = GobangOnline.move2position(move);
                         var piece = _this.add.sprite(pos.x, pos.y, 'piece');
                         var blackTurn = data.moveId % 2 == 0;
                         if (!blackTurn) {
@@ -1200,7 +1202,7 @@ var GobangOnline;
                 this.timer2.setText(secondsLeft.toString());
             }
             if (this.takingTurn) {
-                var move = this.position2move(this.game.input.activePointer);
+                var move = GobangOnline.position2move(this.game.input.activePointer);
                 if (this.game.input.activePointer.isDown) {
                     if (this.localBoard.isMoveValid(move) && !this.pendingMove) {
                         this.pendingMove = move;
@@ -1214,18 +1216,6 @@ var GobangOnline;
                     this.pendingMove = null;
                 }
             }
-        };
-        MultiPlayer.prototype.move2position = function (move) {
-            return {
-                x: move.column * (GobangOnline.Settings.BOARD_X_END - GobangOnline.Settings.BOARD_X_START) / (GobangOnline.Settings.BOARD_SIZE - 1) + GobangOnline.Settings.BOARD_X_START,
-                y: move.row * (GobangOnline.Settings.BOARD_Y_END - GobangOnline.Settings.BOARD_Y_START) / (GobangOnline.Settings.BOARD_SIZE - 1) + GobangOnline.Settings.BOARD_Y_START
-            };
-        };
-        MultiPlayer.prototype.position2move = function (position) {
-            return {
-                row: Math.round((position.y - GobangOnline.Settings.BOARD_Y_START) / ((GobangOnline.Settings.BOARD_Y_END - GobangOnline.Settings.BOARD_Y_START) / (GobangOnline.Settings.BOARD_SIZE - 1))),
-                column: Math.round((position.x - GobangOnline.Settings.BOARD_X_START) / ((GobangOnline.Settings.BOARD_X_END - GobangOnline.Settings.BOARD_X_START) / (GobangOnline.Settings.BOARD_SIZE - 1)))
-            };
         };
         return MultiPlayer;
     })(Phaser.State);

@@ -20,6 +20,20 @@ module GobangOnline {
     return matrix;
   }
 
+  export function move2position(move: Move): { x: number; y: number } {
+    return {
+      x: move.column*(Settings.BOARD_X_END - Settings.BOARD_X_START)/(Settings.BOARD_SIZE-1)+Settings.BOARD_X_START,
+      y: move.row*(Settings.BOARD_Y_END - Settings.BOARD_Y_START)/(Settings.BOARD_SIZE-1)+Settings.BOARD_Y_START
+    };
+  }
+
+  export function position2move(position: { x: number; y: number }): Move {
+    return {
+      row: Math.round((position.y-Settings.BOARD_Y_START)/((Settings.BOARD_Y_END - Settings.BOARD_Y_START)/(Settings.BOARD_SIZE-1))),
+      column: Math.round((position.x-Settings.BOARD_X_START)/((Settings.BOARD_X_END - Settings.BOARD_X_START)/(Settings.BOARD_SIZE-1)))
+    };
+  }
+
   export class Board {
     private table: Color[][];
     private moveLog: Move[];

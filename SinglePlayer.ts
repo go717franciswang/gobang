@@ -43,7 +43,7 @@ module GobangOnline {
       this.aiPlayer = new AiPlayer(this.aiDepth, this.maxCandidates);
       this.engine = new Gobang(Settings.BOARD_SIZE, this.humanPlayer, this.aiPlayer);
       this.engine.setOnRegisterMove((player, move) => {
-        var pos = this.move2position(move);
+        var pos = move2position(move);
         var piece = this.add.sprite(pos.x, pos.y, 'piece');
         if (player.color == Color.White) {
           piece.frame = 1;
@@ -56,23 +56,9 @@ module GobangOnline {
       this.engine.startGame();
     }
 
-    move2position(move: Move): { x: number; y: number } {
-      return {
-        x: move.column*(Settings.BOARD_X_END - Settings.BOARD_X_START)/(Settings.BOARD_SIZE-1)+Settings.BOARD_X_START,
-        y: move.row*(Settings.BOARD_Y_END - Settings.BOARD_Y_START)/(Settings.BOARD_SIZE-1)+Settings.BOARD_Y_START
-      };
-    }
-
-    position2move(position: { x: number; y: number }): Move {
-      return {
-        row: Math.round((position.y-Settings.BOARD_Y_START)/((Settings.BOARD_Y_END - Settings.BOARD_Y_START)/(Settings.BOARD_SIZE-1))),
-        column: Math.round((position.x-Settings.BOARD_X_START)/((Settings.BOARD_X_END - Settings.BOARD_X_START)/(Settings.BOARD_SIZE-1)))
-      };
-    }
-
     update() {
       if (this.humanPlayer.takingTurn) {
-        var move = this.position2move(this.game.input.activePointer);
+        var move = position2move(this.game.input.activePointer);
 
         if (this.game.input.activePointer.isDown) {
           if (this.engine.board.isMoveValid(move) && !this.pendingMove) {

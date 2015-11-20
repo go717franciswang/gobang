@@ -204,7 +204,7 @@ module GobangOnline {
           break;
           case MsgType.Move:
             var move:Move = data.move;
-            var pos = this.move2position(move);
+            var pos = move2position(move);
             var piece = this.add.sprite(pos.x, pos.y, 'piece');
             var blackTurn = data.moveId%2 == 0;
             if (!blackTurn) {
@@ -254,7 +254,7 @@ module GobangOnline {
       }
 
       if (this.takingTurn) {
-        var move = this.position2move(this.game.input.activePointer);
+        var move = position2move(this.game.input.activePointer);
 
         if (this.game.input.activePointer.isDown) {
           if (this.localBoard.isMoveValid(move) && !this.pendingMove) {
@@ -268,20 +268,6 @@ module GobangOnline {
           this.pendingMove = null;
         }
       }
-    }
-
-    move2position(move: Move): { x: number; y: number } {
-      return {
-        x: move.column*(Settings.BOARD_X_END - Settings.BOARD_X_START)/(Settings.BOARD_SIZE-1)+Settings.BOARD_X_START,
-        y: move.row*(Settings.BOARD_Y_END - Settings.BOARD_Y_START)/(Settings.BOARD_SIZE-1)+Settings.BOARD_Y_START
-      };
-    }
-
-    position2move(position: { x: number; y: number }): Move {
-      return {
-        row: Math.round((position.y-Settings.BOARD_Y_START)/((Settings.BOARD_Y_END - Settings.BOARD_Y_START)/(Settings.BOARD_SIZE-1))),
-        column: Math.round((position.x-Settings.BOARD_X_START)/((Settings.BOARD_X_END - Settings.BOARD_X_START)/(Settings.BOARD_SIZE-1)))
-      };
     }
   }
 }
