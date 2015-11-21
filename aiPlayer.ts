@@ -7,7 +7,6 @@ module GobangOnline {
 
   export class AiPlayer implements Player {
     public color: Color;
-    private solver: Solver;
 
     constructor(private depth:number, private maxCandidates:number) {
       console.log(this.depth, this.maxCandidates);
@@ -21,11 +20,12 @@ module GobangOnline {
     takeTurn(context: Gobang, lastMove: Move): void {
       // console.log('heuristics: ' + computeHeuristicOfBoard(this, context.board));
 
-      this.solver = new Solver(this.color, this.depth, this.maxCandidates, Algo.Alphabeta);
-      var maximizingMove = this.solver.solve(context.board);
+      var solver = new Solver(this.color, this.depth, this.maxCandidates, Algo.Alphabeta);
+      var maximizingMove = solver.solve(context.board);
       console.log(maximizingMove);
       console.log('end turn');
-      context.registerMove(this, maximizingMove);
+      if (maximizingMove == null) context.forfeit(this);
+      else context.registerMove(this, maximizingMove);
     }
 
     badMove(context: Gobang, badMove: Move): void {
@@ -67,9 +67,9 @@ module GobangOnline {
           node.setColorAt(m, this.color);
           var v1 = this.minimax(node, depth-1, !maximizingPlayer);
 
-          if (depth == this.depth) {
-            console.log(v1, m);
-          }
+          //if (depth == this.depth) {
+          //  console.log(v1, m);
+          //}
 
           if (depth == this.depth && v1 > v) {
             this.maximizingMove = m;
@@ -108,9 +108,9 @@ module GobangOnline {
           var m = moves[i];
           node.setColorAt(m, this.color);
           var tmp = this.alphabeta(node, depth-1, v, beta, !maximizingPlayer);
-          if (depth == this.depth) {
-            console.log(tmp, m);
-          }
+          //if (depth == this.depth) {
+          //  console.log(tmp, m);
+          //}
           if (depth == this.depth && tmp > v) {
             this.maximizingMove = m;
           }

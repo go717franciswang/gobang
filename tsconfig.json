@@ -21,23 +21,19 @@
         "!./node_modules/**/*"
     ],
     "files": [
+        "./aiPlayer.ts",
+        "./board.ts",
         "./Boot.ts",
         "./DifficultyMenu.ts",
         "./Game.ts",
-        "./MainMenu.ts",
-        "./MediaStream.d.ts",
-        "./MultiPlayer.ts",
-        "./Preloader.ts",
-        "./RTCPeerConnection.d.ts",
-        "./SinglePlayer.ts",
-        "./Test.ts",
-        "./aiPlayer.ts",
-        "./board.ts",
         "./gobang.ts",
         "./heuristics.ts",
         "./humanPlayer.ts",
+        "./MainMenu.ts",
+        "./MediaStream.d.ts",
         "./message.ts",
         "./move.ts",
+        "./MultiPlayer.ts",
         "./p2.d.ts",
         "./patternScores.ts",
         "./patternSearchTree.ts",
@@ -45,7 +41,14 @@
         "./phaser.d.ts",
         "./pixi.d.ts",
         "./player.ts",
+        "./Preloader.ts",
         "./remotePlayer.ts",
-        "./settings.ts"
-    ]
+        "./RTCPeerConnection.d.ts",
+        "./settings.ts",
+        "./SinglePlayer.ts",
+        "./Test.ts"
+    ],
+    "atom": {
+        "rewriteTsconfig": true
+    }
 }

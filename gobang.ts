@@ -41,6 +41,15 @@ module GobangOnline {
       this.onRegisterMove = callback;
     }
 
+    forfeit(player:Player) {
+      this.gameOver = true;
+      player.lose();
+      this.nonPendingPlayer.win();
+      if (this.onGameOver) {
+        this.onGameOver();
+      }
+    }
+
     registerMove(player: Player, move: Move): void {
       if (this.gameOver || player != this.pendingPlayer) {
         return;

@@ -21,11 +21,11 @@ module GobangOnline {
       });
 
       addButton(this.game, this.game.width/2, this.game.height/2, 'MEDIUM', () => {
-        this.game.state.start('SinglePlayer', true, false, 2, 50);
+        this.game.state.start('SinglePlayer', true, false, 2, 100);
       });
 
       addButton(this.game, this.game.width/2, this.game.height/2+150, 'HARD', () => {
-        this.game.state.start('SinglePlayer', true, false, 3, 50);
+        this.game.state.start('SinglePlayer', true, false, 3, 100);
       });
     }
   }
