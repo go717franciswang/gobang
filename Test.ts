@@ -7,7 +7,7 @@ module GobangOnline {
   // x represents black
   // o represents white
   // ? represents an acceptable answer
-  // 💻 represents new AI move
+  // A represents new AI move
   function loadBoard(data: string[]): { board:Board, acceptableAnwsers:Move[] } {
     var size = data.length;
     var board = new Board(size);
@@ -49,7 +49,7 @@ module GobangOnline {
     for (var i = 0; i < data.length; i++) {
       var id = ""+i+"|";
       if (answer.row == i) {
-        var row = data[i].substr(0, answer.column) + "💻" + data[i].substr(answer.column+1, data[i].length-answer.column-1);
+        var row = data[i].substr(0, answer.column) + "A" + data[i].substr(answer.column+1, data[i].length-answer.column-1);
         console.log(id+row);
       } else {
         console.log(id+data[i]);

@@ -1295,7 +1295,7 @@ var GobangOnline;
         for (var i = 0; i < data.length; i++) {
             var id = "" + i + "|";
             if (answer.row == i) {
-                var row = data[i].substr(0, answer.column) + "💻" + data[i].substr(answer.column + 1, data[i].length - answer.column - 1);
+                var row = data[i].substr(0, answer.column) + "A" + data[i].substr(answer.column + 1, data[i].length - answer.column - 1);
                 console.log(id + row);
             }
             else {
