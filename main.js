@@ -1355,10 +1355,29 @@ var GobangOnline;
         assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Advanced AI");
     }
     GobangOnline.test3 = test3;
+    function test4() {
+        var data = ["..xxx...",
+            ".....o..",
+            ".....o..",
+            ".....o..",
+            ".....?..",
+            ".....o..",
+            "........",
+            "........"];
+        var info = loadBoard(data);
+        var m1 = new GobangOnline.Solver(GobangOnline.Color.Black, 1, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
+        assertAcceptableAnser(m1, info.acceptableAnwsers, data, "Easy AI");
+        var m2 = new GobangOnline.Solver(GobangOnline.Color.Black, 2, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
+        assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Intermediate AI");
+        var m3 = new GobangOnline.Solver(GobangOnline.Color.Black, 3, 100, GobangOnline.Algo.Alphabeta).solve(info.board);
+        assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Advanced AI");
+    }
+    GobangOnline.test4 = test4;
     function testAll() {
         test1();
         test2();
         test3();
+        test4();
     }
     GobangOnline.testAll = testAll;
 })(GobangOnline || (GobangOnline = {}));

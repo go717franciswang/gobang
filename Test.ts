@@ -118,9 +118,31 @@ module GobangOnline {
     assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Advanced AI");
   }
 
+  export function test4() {
+    var data = ["..xxx...",
+                ".....o..",
+                ".....o..",
+                ".....o..",
+                ".....?..",
+                ".....o..",
+                "........",
+                "........"];
+    var info = loadBoard(data);
+
+    var m1 = new Solver(Color.Black, 1, 100, Algo.Alphabeta).solve(info.board);
+    assertAcceptableAnser(m1, info.acceptableAnwsers, data, "Easy AI"); // this test passes, but it makes the wrong move in game!!!
+
+    var m2 = new Solver(Color.Black, 2, 100, Algo.Alphabeta).solve(info.board);
+    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Intermediate AI");
+
+    var m3 = new Solver(Color.Black, 3, 100, Algo.Alphabeta).solve(info.board);
+    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Advanced AI");
+  }
+
   export function testAll() {
     test1();
     test2();
     test3();
+    test4();
   }
 }
