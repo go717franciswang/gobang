@@ -68,18 +68,18 @@ module GobangOnline {
     var info = loadBoard(data);
 
     var m1 = new Solver(Color.White, 1, 100, Algo.Alphabeta).solve(info.board);
-    assertAcceptableAnser(m1, info.acceptableAnwsers, data, "Easy AI");
+    assertAcceptableAnser(m1, info.acceptableAnwsers, data, "T1, Easy AI");
 
     var m2 = new Solver(Color.White, 2, 100, Algo.Alphabeta).solve(info.board);
-    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Intermediate AI");
+    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "T1, Intermediate AI");
 
     var m3 = new Solver(Color.White, 3, 100, Algo.Alphabeta).solve(info.board);
-    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Advanced AI");
+    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "T1, Advanced AI");
   }
 
   export function test2() {
     var data = [".......",
-                "..o.o.o",
+                "..o?o.o",
                 "..oxxx.",
                 "..oox..",
                 "..?xx..",
@@ -88,13 +88,13 @@ module GobangOnline {
     var info = loadBoard(data);
 
     var m1 = new Solver(Color.White, 1, 100, Algo.Alphabeta).solve(info.board);
-    assertAcceptableAnser(m1, info.acceptableAnwsers, data, "Easy AI");
+    assertAcceptableAnser(m1, info.acceptableAnwsers, data, "T2, Easy AI");
 
     var m2 = new Solver(Color.White, 2, 100, Algo.Alphabeta).solve(info.board);
-    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Intermediate AI");
+    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "T2, Intermediate AI");
 
     var m3 = new Solver(Color.White, 3, 100, Algo.Alphabeta).solve(info.board);
-    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Advanced AI");
+    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "T2, Advanced AI");
   }
 
   export function test3() {
@@ -109,13 +109,13 @@ module GobangOnline {
     var info = loadBoard(data);
 
     var m1 = new Solver(Color.Black, 1, 100, Algo.Alphabeta).solve(info.board);
-    assertAcceptableAnser(m1, info.acceptableAnwsers, data, "Easy AI"); // this test passes, but it makes the wrong move in game!!!
+    assertAcceptableAnser(m1, info.acceptableAnwsers, data, "T3, Easy AI");
 
     var m2 = new Solver(Color.Black, 2, 100, Algo.Alphabeta).solve(info.board);
-    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Intermediate AI");
+    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "T3, Intermediate AI");
 
     var m3 = new Solver(Color.Black, 3, 100, Algo.Alphabeta).solve(info.board);
-    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Advanced AI");
+    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "T3, Advanced AI");
   }
 
   export function test4() {
@@ -130,13 +130,13 @@ module GobangOnline {
     var info = loadBoard(data);
 
     var m1 = new Solver(Color.Black, 1, 100, Algo.Alphabeta).solve(info.board);
-    assertAcceptableAnser(m1, info.acceptableAnwsers, data, "Easy AI"); // this test passes, but it makes the wrong move in game!!!
+    assertAcceptableAnser(m1, info.acceptableAnwsers, data, "T4, Easy AI");
 
     var m2 = new Solver(Color.Black, 2, 100, Algo.Alphabeta).solve(info.board);
-    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Intermediate AI");
+    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "T4, Intermediate AI");
 
     var m3 = new Solver(Color.Black, 3, 100, Algo.Alphabeta).solve(info.board);
-    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "Advanced AI");
+    assertAcceptableAnser(m2, info.acceptableAnwsers, data, "T4, Advanced AI");
   }
 
   export function testAll() {

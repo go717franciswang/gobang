@@ -85,7 +85,7 @@ module GobangOnline {
       var node = root;
       var dx = directions[i][0];
       var dy = directions[i][1];
-      var edgetPatternName = null;
+      var edgePatternName = null;
 
       var j = 0;
       while (true) {
@@ -98,7 +98,7 @@ module GobangOnline {
         if (node.children[ownership]) {
           node = node.children[ownership];
           if (node.name) {
-            edgetPatternName = node.name;
+            edgePatternName = node.name;
             for (var k = 0; k <= j; k++) {
               searched[move.row+dy*k][move.column+dx*k] = true;
             }
@@ -107,13 +107,13 @@ module GobangOnline {
           break;
         }
 
-        if (edgetPatternName) {
-          // only push the edge pattern to avoid the following situation
-          // 011101 misinterpreted as both 活三 and 冲四
-          patternNames.push(node.name);
-        }
-
         j++;
+      }
+
+      if (edgePatternName) {
+        // only push the edge pattern to avoid the following situation
+        // 011101 misinterpreted as both 活三 and 冲四
+        patternNames.push(node.name);
       }
     }
 

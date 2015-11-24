@@ -25,6 +25,9 @@ module GobangOnline {
       patterns: [
         "011112",
         "10111",
+        // although appear to be a duplicate of the one above,
+        // but it is required to prevent from matching 0111
+        "101110", 
         "11011"
       ],
       score: 2101,
