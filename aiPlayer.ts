@@ -8,10 +8,7 @@ module GobangOnline {
   export class AiPlayer implements Player {
     public color: Color;
 
-    constructor(private depth:number, private maxCandidates:number) {
-      console.log(this.depth, this.maxCandidates);
-
-    }
+    constructor(private depth:number, private maxCandidates:number) { }
 
     setColor(color: Color) {
       this.color = color;

@@ -27,7 +27,7 @@ module GobangOnline {
         "10111",
         // although appear to be a duplicate of the one above,
         // but it is required to prevent from matching 0111
-        "101110", 
+        "101110",
         "11011"
       ],
       score: 2101,
@@ -135,8 +135,6 @@ module GobangOnline {
       "score": 3
     },
   ];
-
-  console.log(alternativeScore);
 
   function countPatternNames(patterNames:string[]) {
     var count = {};

@@ -133,7 +133,6 @@ var GobangOnline;
             "score": 3
         },
     ];
-    console.log(alternativeScore);
     function countPatternNames(patterNames) {
         var count = {};
         for (var i = 0; i < patterNames.length; i++) {
@@ -504,7 +503,6 @@ var GobangOnline;
         function AiPlayer(depth, maxCandidates) {
             this.depth = depth;
             this.maxCandidates = maxCandidates;
-            console.log(this.depth, this.maxCandidates);
         }
         AiPlayer.prototype.setColor = function (color) {
             this.color = color;
