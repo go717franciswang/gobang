@@ -263,6 +263,27 @@ var GobangOnline;
             this.table = buildSquareMatrix(size, Color.Empty);
             this.moveLog = [];
         }
+        Board.prototype.printBoard = function () {
+            var rows = [];
+            for (var i = 0; i < this.table.length; i++) {
+                var row = "";
+                for (var j = 0; j < this.table.length; j++) {
+                    switch (this.table[i][j]) {
+                        case Color.Empty:
+                            row += ".";
+                            break;
+                        case Color.Black:
+                            row += "x";
+                            break;
+                        case Color.White:
+                            row += "o";
+                            break;
+                    }
+                }
+                rows.push(row);
+            }
+            return rows;
+        };
         Board.prototype.getMoveAt = function (id) {
             return this.moveLog[id];
         };
@@ -939,6 +960,7 @@ var GobangOnline;
                 _this.click.play();
             });
             this.engine.startGame();
+            GobangOnline.activeBoard = this.engine.board;
         };
         SinglePlayer.prototype.update = function () {
             if (this.humanPlayer.takingTurn) {

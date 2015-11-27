@@ -8,6 +8,7 @@
 /// <reference path="./Preloader.ts"/>
 
 module GobangOnline {
+  export var activeBoard:Board;
 
   export class SinglePlayer extends Phaser.State {
 
@@ -57,6 +58,8 @@ module GobangOnline {
         this.click.play();
       });
       this.engine.startGame();
+
+      activeBoard = this.engine.board;
     }
 
     update() {

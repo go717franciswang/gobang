@@ -43,6 +43,23 @@ module GobangOnline {
       this.moveLog = [];
     }
 
+    printBoard() {
+      var rows = [];
+      for (var i = 0; i < this.table.length; i++) {
+        var row = "";
+        for (var j = 0; j < this.table.length; j++) {
+          switch (this.table[i][j]) {
+            case Color.Empty: row += "."; break;
+            case Color.Black: row += "x"; break;
+            case Color.White: row += "o"; break;
+          }
+        }
+
+        rows.push(row);
+      }
+      return rows;
+    }
+
     getMoveAt(id) {
       return this.moveLog[id];
     }
