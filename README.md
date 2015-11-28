@@ -1,5 +1,6 @@
 ## Demo
 [demo](http://blog.francis.wang/gobang/)
+![screenshot](https://raw.githubusercontent.com/go717franciswang/gobang/master/Capture.PNG)
 
 ## Credit
 ### Image
